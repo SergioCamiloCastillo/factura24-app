@@ -1,31 +1,72 @@
+import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
+import 'package:factura24/features/invoice/presentation/providers/invoices_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   static const name = "home-screen";
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         appBar: AppBar(
+          actions: [
+            GestureDetector(
+                onTap: () => _dialogBuilder(context, ref),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.add_circle_outline,
+                      color: Color(0xFF06B981),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Agregar categoría',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF06B981))),
+                    SizedBox(
+                      width: 5,
+                    )
+                  ],
+                )),
+          ],
           title: const Text('Facturas',
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: const Color(0xFF06B981),
-          onPressed: () => _dialogBuilder(context),
+          onPressed: () => _dialogBuilder(context, ref),
           child: const Icon(
             Icons.add,
             color: Colors.white,
           ),
         ),
         body: const Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
           child: CarouselTabsScreen(),
         ));
   }
 
-  Future<void> _dialogBuilder(BuildContext context) {
+  Future<void> _dialogBuilder(BuildContext context, WidgetRef ref) {
+    TextEditingController categoryController =
+        TextEditingController(); // Controlador para el TextField
+    List<Map<String, String>> listColors = [
+      {'label': 'Rojo', 'value': 'red'},
+      {'label': 'Verde', 'value': 'green'},
+      {'label': 'Azul', 'value': 'blue'},
+      {'label': 'Amarillo', 'value': 'yellow'},
+      {'label': 'Morado', 'value': 'purple'},
+      {'label': 'Café', 'value': 'brown'},
+      {'label': 'Naranja', 'value': 'orange'},
+      {'label': 'Beige', 'value': 'beige'},
+      {'label': 'Rosa', 'value': 'pink'}
+    ];
+    Map<String, String> selectedColor = listColors.first;
+
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -35,10 +76,27 @@ class HomeScreen extends StatelessWidget {
             'Agrega nueva categoría de factura',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          content: const TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Ingrese nombre de la categoría',
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: categoryController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Ingrese nombre de la categoría',
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                _DropDownColor(
+                  listColors: listColors,
+                  dropdownValue: selectedColor,
+                  onChanged: (value) {
+                    selectedColor = value;
+                  },
+                )
+              ],
             ),
           ),
           actions: <Widget>[
@@ -57,6 +115,15 @@ class HomeScreen extends StatelessWidget {
               ),
               child: const Text('Agregar'),
               onPressed: () {
+                final notifier = ref.read(nowCategoriesProvider.notifier);
+                notifier.addCategory(
+                  CategoryInvoiceEntity(
+                    id: '50',
+                    user: 1,
+                    title: categoryController.text,
+                    color: selectedColor['value']!,
+                  ),
+                );
                 Navigator.of(context).pop();
               },
             ),
@@ -67,24 +134,111 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class CarouselTabsScreen extends StatefulWidget {
+class _DropDownColor extends StatefulWidget {
+  const _DropDownColor({
+    Key? key,
+    required this.listColors,
+    required this.dropdownValue,
+    required this.onChanged,
+  }) : super(key: key);
+
+  final List<Map<String, String>> listColors;
+  final Map<String, String> dropdownValue;
+  final ValueChanged<Map<String, String>> onChanged;
+
+  @override
+  State<_DropDownColor> createState() => _DropDownColorState();
+}
+
+class _DropDownColorState extends State<_DropDownColor> {
+  late Map<String, String> dropdownValue;
+  Map<String, Color> colorMap = {
+    'red': Colors.red,
+    'green': Colors.green,
+    'blue': Colors.blue,
+    'yellow': Colors.yellow,
+    'purple': Colors.purple,
+    'brown': const Color(0xFFB88E74),
+    'orange': Colors.orange,
+    'beige': const Color(0xFFF5F5DC),
+    'pink': Colors.pink
+    // Agrega más colores según necesites
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    dropdownValue = widget.dropdownValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: InputDecorator(
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Selecciona un color de la categoría',
+              contentPadding: EdgeInsets.symmetric(
+                  vertical: 2, horizontal: 10), // Reducir el espacio interno
+            ),
+            child: DropdownButton<Map<String, String>>(
+              value: dropdownValue,
+              onChanged: (value) {
+                setState(() {
+                  dropdownValue = value!;
+                  widget.onChanged(value);
+                });
+              },
+              items:
+                  widget.listColors.map<DropdownMenuItem<Map<String, String>>>(
+                (color) {
+                  return DropdownMenuItem<Map<String, String>>(
+                    value: color,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          color: colorMap[color['value']!] ?? Colors.black,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(color['label']!),
+                      ],
+                    ),
+                  );
+                },
+              ).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CarouselTabsScreen extends ConsumerStatefulWidget {
   const CarouselTabsScreen({super.key});
 
   @override
   _CarouselTabsScreenState createState() => _CarouselTabsScreenState();
 }
 
-class _CarouselTabsScreenState extends State<CarouselTabsScreen> {
+class _CarouselTabsScreenState extends ConsumerState {
+  String capitalize(String s) {
+    return s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : '';
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ref.read(nowCategoriesProvider.notifier).loadCategories();
+  }
+
   int selectedCard = 0;
 
-  final List<Map<String, dynamic>> categoriesInvoice = [
-    {'color': 'red', 'title': 'Agua'},
-    {'color': 'blue', 'title': 'Luz'},
-    {'color': 'green', 'title': 'Gas'},
-    {'color': 'yellow', 'title': 'Internet y Teléfono'},
-    {'color': 'brown', 'title': 'Claro'},
-    {'color': 'orange', 'title': 'Netflix'},
-  ];
   final List<Map<String, dynamic>> colors = [
     {'nameColor': 'red', 'color': Colors.pinkAccent},
     {'nameColor': 'blue', 'color': Colors.lightBlue},
@@ -105,10 +259,12 @@ class _CarouselTabsScreenState extends State<CarouselTabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final categoriesInvoice = ref.watch(nowCategoriesProvider);
+
     List<Map<String, dynamic>> matchingColorsData =
         categoriesInvoice.map((category) {
       var colorData = colors.firstWhere(
-          (colorMap) => colorMap['nameColor'] == category['color'],
+          (colorMap) => colorMap['nameColor'] == category.color,
           orElse: () => null!);
       return colorData != null
           ? {'color': colorData['color']}
@@ -116,103 +272,129 @@ class _CarouselTabsScreenState extends State<CarouselTabsScreen> {
               'color': Colors.black
             }; // Si hay coincidencia, devuelve el color correspondiente, de lo contrario, negro
     }).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 75.0, // Altura fija para las tarjetas
-          child: ListView.separated(
-            separatorBuilder: (BuildContext context, int index) {
-              return const SizedBox(
-                  width: 6.0); // Espacio horizontal entre las tarjetas
-            },
-            scrollDirection: Axis.horizontal,
-            itemCount: categoriesInvoice.length,
-            itemBuilder: (BuildContext context, int index) {
-              return GestureDetector(
-                onTap: () {
-                  updateSelectedCard(index);
-                },
-                child: SingleChildScrollView(
-                  child: SizedBox(
-                    width: 130.0, // Ancho fijo para las tarjetas
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Opacity(
-                            opacity:
-                                0.2, // Cambia este valor para ajustar la opacidad
-                            child: Card(
-                              margin: const EdgeInsets.all(0.0),
-                              color: matchingColorsData[index]['color'],
-                              elevation: 4.0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment
-                                .start, // Alinear el contenido a la izquierda
+    return categoriesInvoice.isNotEmpty
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 75.0, // Altura fija para las tarjetas
+                child: ListView.separated(
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(
+                        width: 6.0); // Espacio horizontal entre las tarjetas
+                  },
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categoriesInvoice.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final category = categoriesInvoice[index];
+                    return GestureDetector(
+                      onTap: () {
+                        updateSelectedCard(index);
+                      },
+                      child: SingleChildScrollView(
+                        child: SizedBox(
+                          width: 130.0, // Ancho fijo para las tarjetas
+                          child: Stack(
                             children: [
-                              Text(
-                                categoriesInvoice[index]['title'],
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Color(
-                                    0xff59656F,
-                                  ), // Mantener el color del texto sin opacidad
+                              Positioned.fill(
+                                child: Opacity(
+                                  opacity:
+                                      0.2, // Cambia este valor para ajustar la opacidad
+                                  child: Card(
+                                    margin: const EdgeInsets.all(0.0),
+                                    color: matchingColorsData[index]['color'],
+                                    elevation: 4.0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6.0),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const Text(
-                                '3 facturas',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Color(
-                                    0xff59656F,
-                                  ), // Mantener el color del texto sin opacidad
+                              Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment
+                                      .start, // Alinear el contenido a la izquierda
+                                  children: [
+                                    Text(
+                                      capitalize(category.title),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: Color(
+                                          0xff59656F,
+                                        ), // Mantener el color del texto sin opacidad
+                                      ),
+                                    ),
+                                    const Text(
+                                      '3 facturas',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Color(
+                                          0xff59656F,
+                                        ), // Mantener el color del texto sin opacidad
+                                      ),
+                                    )
+                                  ],
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Información de la tarjeta seleccionada:',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 10.0),
-              Text(
-                'Contenido para la tarjeta ${selectedCard + 1}',
-                style: const TextStyle(
-                  fontSize: 16.0,
+              Container(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Información de la tarjeta seleccionada:',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    Text(
+                      'Contenido para la tarjeta ${selectedCard + 1}',
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-        ),
-      ],
-    );
+          )
+        : Center(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/images/box-empty.png',
+                  width: 200,
+                  height: 200,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Text('!Sin categorías de facturas!',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text(
+                    'Por favor, toca el botón de agregar categoría para crear una nueva categoría de factura',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13, color: Color(0xFF59656F)),
+                  ),
+                )
+              ],
+            ),
+          );
   }
 }
