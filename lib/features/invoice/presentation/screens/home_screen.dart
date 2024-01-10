@@ -4,6 +4,9 @@ import 'package:factura24/features/invoice/presentation/providers/invoices_provi
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:math';
 
 class HomeScreen extends ConsumerWidget {
   static const name = "home-screen";
@@ -45,6 +48,27 @@ class HomeScreen extends ConsumerWidget {
           padding: EdgeInsets.symmetric(horizontal: 10.0),
           child: CarouselTabsScreen(),
         ));
+  }
+
+  String generateHash(String input) {
+    // Convierte la cadena de entrada a bytes
+    List<int> bytes = utf8.encode(input);
+
+    // Inicializa el valor del hash con un número aleatorio
+    int hash = Random().nextInt(1000);
+
+    // Factor de mezcla para mejorar la calidad del hash
+    const mixFactor = 31;
+
+    // Aplica la función hash sumando y mezclando los valores de los bytes
+    for (int byte in bytes) {
+      hash = (hash * mixFactor) ^ byte;
+    }
+
+    // Convierte el hash a una cadena hexadecimal
+    String hexHash = hash.toRadixString(16);
+
+    return hexHash;
   }
 
   Future<void> _dialogBuilder(BuildContext context, WidgetRef ref) {
@@ -111,10 +135,19 @@ class HomeScreen extends ConsumerWidget {
               ),
               child: const Text('Agregar'),
               onPressed: () {
+                DateTime now = DateTime.now();
+
+                // Convierte la fecha y hora a una cadena formateada
+                String formattedDateTime =
+                    "${now.year}-${now.month}-${now.day} ${now.hour}:${now.minute}:${now.second}";
+
+                // Calcula el hash utilizando una función hash básica
+                String hash = generateHash(formattedDateTime);
+
                 final notifier = ref.read(nowCategoriesProvider.notifier);
                 notifier.addCategory(
                   CategoryInvoiceEntity(
-                    id: '50',
+                    id: hash,
                     user: 1,
                     title: categoryController.text,
                     color: selectedColor['value']!,
@@ -233,7 +266,7 @@ class _CarouselTabsScreenState extends ConsumerState {
     ref.read(nowCategoriesProvider.notifier).loadCategories();
   }
 
-  int selectedCard = 0;
+  String selectedCard = '';
 
   final List<Map<String, dynamic>> colors = [
     {'nameColor': 'red', 'color': Colors.pinkAccent},
@@ -247,7 +280,7 @@ class _CarouselTabsScreenState extends ConsumerState {
     {'nameColor': 'pink', 'color': Colors.pinkAccent}
   ];
 
-  void updateSelectedCard(int index) {
+  void updateSelectedCard(String index) {
     setState(() {
       selectedCard = index;
     });
@@ -257,6 +290,11 @@ class _CarouselTabsScreenState extends ConsumerState {
   Widget build(BuildContext context) {
     final categoriesInvoiceState = ref.watch(nowCategoriesProvider);
     final invoicesState = ref.watch(invoicesProvider);
+    selectedCard = selectedCard.isNotEmpty
+        ? selectedCard
+        : categoriesInvoiceState.isNotEmpty
+            ? categoriesInvoiceState.first.id
+            : '';
     List<Map<String, dynamic>> matchingColorsData =
         categoriesInvoiceState.map((category) {
       var colorData = colors.firstWhere(
@@ -285,7 +323,7 @@ class _CarouselTabsScreenState extends ConsumerState {
                     final category = categoriesInvoiceState[index];
                     return GestureDetector(
                       onTap: () {
-                        updateSelectedCard(index);
+                        updateSelectedCard(category.id);
                       },
                       child: SingleChildScrollView(
                         child: SizedBox(
@@ -297,19 +335,21 @@ class _CarouselTabsScreenState extends ConsumerState {
                                   opacity: 0.5,
                                   child: Card(
                                     margin: const EdgeInsets.all(0.0),
-                                    color: selectedCard == index
+                                    color: selectedCard == category.id
                                         ? matchingColorsData[index]['color']
                                             .withAlpha(
                                                 200) // Cambia el valor alpha según lo deseado
                                         : matchingColorsData[index]['color'],
                                     elevation:
-                                        selectedCard == index ? 8.0 : 4.0,
+                                        selectedCard == category.id ? 8.0 : 4.0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(6.0),
                                       side: BorderSide(
                                         color: Colors.red,
-                                        width: selectedCard == index ? 2.0 : 0,
-                                        style: selectedCard == index
+                                        width: selectedCard == category.id
+                                            ? 2.0
+                                            : 0,
+                                        style: selectedCard == category.id
                                             ? BorderStyle.solid
                                             : BorderStyle.none,
                                       ),
