@@ -1,45 +1,34 @@
+import 'package:factura24/features/invoice/domain/entities/invoice_entity.dart';
+import 'package:factura24/features/invoice/domain/repositories/invoices_repository.dart';
 import 'package:factura24/features/invoice/presentation/providers/invoice_repository_provider.dart';
-
-import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final nowCategoriesProvider =
-    StateNotifierProvider<CategoryInvoiceNotifier, List<CategoryInvoiceEntity>>(
-  (ref) {
-    final fetchCategories =
-        ref.watch(categoryInvoiceProvider).getCategoriesInvoice;
-    return CategoryInvoiceNotifier(fetchCategories: fetchCategories);
-  },
-);
+// el invoicesProvider, provee el estado de abajo de manera global, junto con el notifier
+final invoicesProvider =
+    StateNotifierProvider<InvoicesNotifier, InvoicesState>((ref) {
+  final invoicesRepository = ref.watch(invoiceRepositoryProvider);
+  return InvoicesNotifier(invoicesRepository: invoicesRepository);
+});
 
-typedef CategoryInvoiceCallback = Future<List<CategoryInvoiceEntity>>
-    Function();
+//state notifier provider
 
-class CategoryInvoiceNotifier
-    extends StateNotifier<List<CategoryInvoiceEntity>> {
-  CategoryInvoiceCallback fetchCategories;
-  CategoryInvoiceNotifier({required this.fetchCategories}) : super([]);
-
-  Future<void> loadCategories() async {
-    final categories = await fetchCategories();
-    state = [...state, ...categories];
+class InvoicesNotifier extends StateNotifier<InvoicesState> {
+  final InvoicesRepository invoicesRepository;
+  InvoicesNotifier({required this.invoicesRepository})
+      : super(InvoicesState()) {
+    loadInvoices();
   }
 
-  Future<void> addCategory(CategoryInvoiceEntity newCategory) async {
-    state = [...state, newCategory];
+  Future loadInvoices() async {
+    final invoices = await invoicesRepository.getInvoiceByCategoryId(1);
+    state = state.copyWith(invoices: [...state.invoices, ...invoices]);
   }
+}
 
-  Future<void> deleteCategory(CategoryInvoiceEntity categoryToDelete) async {
-    state =
-        state.where((category) => category.id != categoryToDelete.id).toList();
-  }
+class InvoicesState {
+  final List<InvoiceEntity> invoices;
 
-  Future<void> updateCategory(CategoryInvoiceEntity updatedCategory) async {
-    state = state.map((category) {
-      if (category.id == updatedCategory.id) {
-        return updatedCategory;
-      }
-      return category;
-    }).toList();
-  }
+  InvoicesState({this.invoices = const []});
+  InvoicesState copyWith({List<InvoiceEntity>? invoices}) =>
+      InvoicesState(invoices: invoices ?? this.invoices);
 }

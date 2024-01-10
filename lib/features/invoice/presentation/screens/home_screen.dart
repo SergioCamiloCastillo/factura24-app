@@ -1,16 +1,20 @@
 import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
+import 'package:factura24/features/invoice/presentation/providers/categories_invoices_provider.dart';
 import 'package:factura24/features/invoice/presentation/providers/invoices_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerWidget {
   static const name = "home-screen";
+
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: false,
           actions: [
             GestureDetector(
                 onTap: () => _dialogBuilder(context, ref),
@@ -37,14 +41,6 @@ class HomeScreen extends ConsumerWidget {
           title: const Text('Facturas',
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color(0xFF06B981),
-          onPressed: () => _dialogBuilder(context, ref),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
         body: const Padding(
           padding: EdgeInsets.symmetric(horizontal: 10.0),
           child: CarouselTabsScreen(),
@@ -55,8 +51,8 @@ class HomeScreen extends ConsumerWidget {
     TextEditingController categoryController =
         TextEditingController(); // Controlador para el TextField
     List<Map<String, String>> listColors = [
-      {'label': 'Rojo', 'value': 'red'},
       {'label': 'Verde', 'value': 'green'},
+      {'label': 'Rojo', 'value': 'red'},
       {'label': 'Azul', 'value': 'blue'},
       {'label': 'Amarillo', 'value': 'yellow'},
       {'label': 'Morado', 'value': 'purple'},
@@ -259,10 +255,10 @@ class _CarouselTabsScreenState extends ConsumerState {
 
   @override
   Widget build(BuildContext context) {
-    final categoriesInvoice = ref.watch(nowCategoriesProvider);
-
+    final categoriesInvoiceState = ref.watch(nowCategoriesProvider);
+    final invoicesState = ref.watch(invoicesProvider);
     List<Map<String, dynamic>> matchingColorsData =
-        categoriesInvoice.map((category) {
+        categoriesInvoiceState.map((category) {
       var colorData = colors.firstWhere(
           (colorMap) => colorMap['nameColor'] == category.color,
           orElse: () => null!);
@@ -272,7 +268,7 @@ class _CarouselTabsScreenState extends ConsumerState {
               'color': Colors.black
             }; // Si hay coincidencia, devuelve el color correspondiente, de lo contrario, negro
     }).toList();
-    return categoriesInvoice.isNotEmpty
+    return categoriesInvoiceState.isNotEmpty
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -284,9 +280,9 @@ class _CarouselTabsScreenState extends ConsumerState {
                         width: 6.0); // Espacio horizontal entre las tarjetas
                   },
                   scrollDirection: Axis.horizontal,
-                  itemCount: categoriesInvoice.length,
+                  itemCount: categoriesInvoiceState.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final category = categoriesInvoice[index];
+                    final category = categoriesInvoiceState[index];
                     return GestureDetector(
                       onTap: () {
                         updateSelectedCard(index);
@@ -298,14 +294,25 @@ class _CarouselTabsScreenState extends ConsumerState {
                             children: [
                               Positioned.fill(
                                 child: Opacity(
-                                  opacity:
-                                      0.2, // Cambia este valor para ajustar la opacidad
+                                  opacity: 0.5,
                                   child: Card(
                                     margin: const EdgeInsets.all(0.0),
-                                    color: matchingColorsData[index]['color'],
-                                    elevation: 4.0,
+                                    color: selectedCard == index
+                                        ? matchingColorsData[index]['color']
+                                            .withAlpha(
+                                                200) // Cambia el valor alpha según lo deseado
+                                        : matchingColorsData[index]['color'],
+                                    elevation:
+                                        selectedCard == index ? 8.0 : 4.0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(6.0),
+                                      side: BorderSide(
+                                        color: Colors.red,
+                                        width: selectedCard == index ? 2.0 : 0,
+                                        style: selectedCard == index
+                                            ? BorderStyle.solid
+                                            : BorderStyle.none,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -347,26 +354,36 @@ class _CarouselTabsScreenState extends ConsumerState {
                   },
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Información de la tarjeta seleccionada:',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: invoicesState.invoices.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final invoice = invoicesState.invoices[index];
+                    return ListTile(
+                      title: Text(invoice.description),
+                      subtitle: Text(invoice.description),
+                    );
+                  },
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 35.0, right: 16.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      backgroundColor: const Color(0xFF06B981),
+                      padding: const EdgeInsets.all(15.0),
                     ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      'Contenido para la tarjeta ${selectedCard + 1}',
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                      ),
+                    onPressed: () {
+                      context.push('/invoice/$selectedCard');
+                    },
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
