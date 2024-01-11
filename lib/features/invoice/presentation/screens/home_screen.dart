@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
 import 'package:factura24/features/invoice/presentation/providers/categories_invoices_provider.dart';
 import 'package:factura24/features/invoice/presentation/providers/invoices_provider.dart';
@@ -286,8 +288,49 @@ class _CarouselTabsScreenState extends ConsumerState {
     });
   }
 
+  void _showModal(BuildContext context, WidgetRef ref) {
+    final selectedCategory = ref.watch(nowCategoriesProvider.select((state) =>
+        state.firstWhere((category) => category.id == selectedCard)));
+
+    // Show modal after a 2-second delay
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('¿Que deseas hacer?'),
+          actions: <Widget>[
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Lógica para editar aquí
+                      Navigator.of(context)
+                          .pop(); // Cerrar el Dialog después de editar
+                    },
+                    child: const Text('Editar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Lógica para borrar aquí
+                      Navigator.of(context)
+                          .pop(); // Cerrar el Dialog después de borrar
+                    },
+                    child: const Text('Borrar'),
+                  )
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    Timer timer0;
     final categoriesInvoiceState = ref.watch(nowCategoriesProvider);
     final invoicesState = ref.watch(invoicesProvider);
     selectedCard = selectedCard.isNotEmpty
@@ -306,6 +349,7 @@ class _CarouselTabsScreenState extends ConsumerState {
               'color': Colors.black
             }; // Si hay coincidencia, devuelve el color correspondiente, de lo contrario, negro
     }).toList();
+
     return categoriesInvoiceState.isNotEmpty
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,6 +366,17 @@ class _CarouselTabsScreenState extends ConsumerState {
                   itemBuilder: (BuildContext context, int index) {
                     final category = categoriesInvoiceState[index];
                     return GestureDetector(
+                      onTapDown: (_) {
+                        //Detect when you click the element
+                        final timer = Timer(
+                          const Duration(seconds: 1),
+                          () {
+                            print('mks todos');
+                            _showModal(context, ref);
+                          },
+                        );
+                        print('tapping');
+                      },
                       onTap: () {
                         updateSelectedCard(category.id);
                       },

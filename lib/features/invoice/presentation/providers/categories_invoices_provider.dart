@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:factura24/features/invoice/presentation/providers/invoice_repository_provider.dart';
 
 import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
+import 'package:factura24/features/shared/infrastructure/services/key_value_storage_service.dart';
+import 'package:factura24/features/shared/infrastructure/services/key_value_storage_service_impl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final nowCategoriesProvider =
@@ -8,7 +12,9 @@ final nowCategoriesProvider =
   (ref) {
     final fetchCategories =
         ref.watch(categoryInvoiceRepositoryProvider).getCategoriesInvoice;
-    return CategoryInvoiceNotifier(fetchCategories: fetchCategories);
+    return CategoryInvoiceNotifier(
+        fetchCategories: fetchCategories,
+        keyValueStorageService: KeyValueStorageServiceImpl());
   },
 );
 
@@ -18,15 +24,20 @@ typedef CategoryInvoiceCallback = Future<List<CategoryInvoiceEntity>>
 class CategoryInvoiceNotifier
     extends StateNotifier<List<CategoryInvoiceEntity>> {
   CategoryInvoiceCallback fetchCategories;
-  CategoryInvoiceNotifier({required this.fetchCategories}) : super([]);
+  KeyValueStorageService keyValueStorageService = KeyValueStorageServiceImpl();
+  CategoryInvoiceNotifier(
+      {required this.fetchCategories, required this.keyValueStorageService})
+      : super([]);
 
   Future<void> loadCategories() async {
     final categories = await fetchCategories();
-    state = [...state, ...categories];
+
+    _loadCategoriesFromStorage();
   }
 
   Future<void> addCategory(CategoryInvoiceEntity newCategory) async {
     state = [...state, newCategory];
+    await _saveCategoriesToStorage();
   }
 
   Future<void> deleteCategory(CategoryInvoiceEntity categoryToDelete) async {
@@ -41,5 +52,30 @@ class CategoryInvoiceNotifier
       }
       return category;
     }).toList();
+  }
+
+  Future<void> _loadCategoriesFromStorage() async {
+    final encodedCategories =
+        await keyValueStorageService.getKeyValue<String>('categories_invoice');
+    if (encodedCategories != null) {
+      final decodedCategories = jsonDecode(encodedCategories);
+      if (decodedCategories is List) {
+        state = List<CategoryInvoiceEntity>.from(decodedCategories
+            .map((json) => CategoryInvoiceEntity.fromJson(json))).toList();
+      }
+    }
+  }
+
+  bool _containsMap(
+      Map<String, dynamic> category, List<Map<String, dynamic>> categoryList) {
+    return categoryList.any((element) => element['id'] == category['id']);
+  }
+
+  // Método auxiliar para guardar la lista de categorías en SharedPreferences
+  Future<void> _saveCategoriesToStorage() async {
+    final encodedCategories =
+        jsonEncode(state.map((category) => category.toJson()).toList());
+    await keyValueStorageService.setKeyValue(
+        'categories_invoice', encodedCategories);
   }
 }
