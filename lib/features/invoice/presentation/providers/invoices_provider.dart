@@ -20,7 +20,7 @@ class InvoicesNotifier extends StateNotifier<InvoicesState> {
   }
 
   Future loadInvoices() async {
-    final invoices = await invoicesRepository.getInvoiceByCategoryId(1);
+    final invoices = await invoicesRepository.getInvoicesByCategoryId(1);
     state = state.copyWith(invoices: [...state.invoices, ...invoices]);
   }
 }

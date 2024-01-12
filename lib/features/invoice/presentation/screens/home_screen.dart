@@ -288,16 +288,16 @@ class _CarouselTabsScreenState extends ConsumerState {
     });
   }
 
-  void _showModal(BuildContext context, WidgetRef ref) {
-    final selectedCategory = ref.watch(nowCategoriesProvider.select((state) =>
-        state.firstWhere((category) => category.id == selectedCard)));
-
+  void _showModal(BuildContext context, WidgetRef ref,
+      CategoryInvoiceEntity categoryToDelete) {
+    final categoryNotifier = ref.read(nowCategoriesProvider.notifier);
     // Show modal after a 2-second delay
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('¿Que deseas hacer?'),
+          title: Text(
+              '¿Que deseas hacer con la categoría "${capitalize(categoryToDelete.title)}"?'),
           actions: <Widget>[
             Center(
               child: Row(
@@ -312,12 +312,21 @@ class _CarouselTabsScreenState extends ConsumerState {
                     child: const Text('Editar'),
                   ),
                   ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.red)),
                     onPressed: () {
                       // Lógica para borrar aquí
+                      categoryNotifier.deleteCategory(categoryToDelete);
+                      // Actualiza selectedCard
+                      final categories = ref.read(nowCategoriesProvider);
+                      updateSelectedCard(
+                          categories.isNotEmpty ? categories.first.id : '');
                       Navigator.of(context)
                           .pop(); // Cerrar el Dialog después de borrar
                     },
-                    child: const Text('Borrar'),
+                    child: const Text('Borrar',
+                        style: TextStyle(color: Colors.white)),
                   )
                 ],
               ),
@@ -366,16 +375,14 @@ class _CarouselTabsScreenState extends ConsumerState {
                   itemBuilder: (BuildContext context, int index) {
                     final category = categoriesInvoiceState[index];
                     return GestureDetector(
-                      onTapDown: (_) {
-                        //Detect when you click the element
+                      onLongPress: () {
                         final timer = Timer(
                           const Duration(seconds: 1),
                           () {
-                            print('mks todos');
-                            _showModal(context, ref);
+                            _showModal(context, ref, category);
                           },
                         );
-                        print('tapping');
+                        print('Long press');
                       },
                       onTap: () {
                         updateSelectedCard(category.id);

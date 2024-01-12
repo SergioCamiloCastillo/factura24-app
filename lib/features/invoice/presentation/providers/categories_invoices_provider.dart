@@ -43,6 +43,7 @@ class CategoryInvoiceNotifier
   Future<void> deleteCategory(CategoryInvoiceEntity categoryToDelete) async {
     state =
         state.where((category) => category.id != categoryToDelete.id).toList();
+    await _saveCategoriesToStorage();
   }
 
   Future<void> updateCategory(CategoryInvoiceEntity updatedCategory) async {

@@ -13,12 +13,17 @@ class InvoiceRepositoryImpl extends InvoicesRepository {
   }
 
   @override
-  Future<List<InvoiceEntity>> getInvoiceByCategoryId(int categoryId) async {
-    return datasource.getInvoiceByCategoryId(categoryId);
+  Future<List<InvoiceEntity>> getInvoicesByCategoryId(int categoryId) async {
+    return datasource.getInvoicesByCategoryId(categoryId);
   }
 
   @override
   Future<InvoiceEntity> createInvoice(Map<String, dynamic> invoiceLike) async {
     return datasource.createInvoice(invoiceLike);
+  }
+  
+  @override
+  Future<InvoiceEntity> getInvoiceById(String id) {
+    return datasource.getInvoiceById(id);
   }
 }
