@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
 import 'package:factura24/features/invoice/presentation/providers/categories_invoices_provider.dart';
 import 'package:factura24/features/invoice/presentation/providers/invoices_provider.dart';
+import 'package:factura24/features/shared/infrastructure/services/colorsMatchCategory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -268,20 +269,21 @@ class _CarouselTabsScreenState extends ConsumerState {
     ref.read(nowCategoriesProvider.notifier).loadCategories();
   }
 
+  Map<String, dynamic> _getSelectedCardInfo() {
+    final selectedCategory = ref.read(nowCategoriesProvider).firstWhere(
+        (category) => category.id == selectedCard,
+        orElse: () => null!);
+
+    return {
+      'id': selectedCategory.id,
+      'title': selectedCategory.title,
+      'color': selectedCategory.color,
+    };
+  }
+
   String selectedCard = '';
 
-  final List<Map<String, dynamic>> colors = [
-    {'nameColor': 'red', 'color': Colors.pinkAccent},
-    {'nameColor': 'blue', 'color': Colors.lightBlue},
-    {'nameColor': 'green', 'color': Colors.lightGreen},
-    {'nameColor': 'yellow', 'color': Colors.yellowAccent},
-    {'nameColor': 'purple', 'color': Colors.purpleAccent},
-    {'nameColor': 'brown', 'color': const Color(0xFFB88E74)},
-    {'nameColor': 'orange', 'color': Colors.orangeAccent},
-    {'nameColor': 'beige', 'color': const Color(0xFFF5F5DC)},
-    {'nameColor': 'pink', 'color': Colors.pinkAccent}
-  ];
-
+  final List<Map<String, dynamic>> colors = globalColors;
   void updateSelectedCard(String index) {
     setState(() {
       selectedCard = index;
@@ -479,7 +481,9 @@ class _CarouselTabsScreenState extends ConsumerState {
                       padding: const EdgeInsets.all(15.0),
                     ),
                     onPressed: () {
-                      context.push('/invoice/$selectedCard');
+                      final selectedCardInfo = _getSelectedCardInfo();
+                      context.push(
+                          '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}');
                     },
                     child: const Icon(
                       Icons.add,
