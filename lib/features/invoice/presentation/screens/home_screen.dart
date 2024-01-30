@@ -329,6 +329,16 @@ class _CarouselTabsScreenState extends ConsumerState {
                           : '');
                       Navigator.of(context)
                           .pop(); // Cerrar el Dialog después de borrar
+                      var snackBar = SnackBar(
+                        duration: const Duration(seconds: 2),
+                        backgroundColor: Colors.red.shade400,
+                        content: const Text('Categoría eliminada exitosamente',
+                            style: TextStyle(fontWeight: FontWeight.w500)),
+                      );
+
+                      // Find the ScaffoldMessenger in the widget tree
+                      // and use it to show a SnackBar.
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
                     child: const Text('Borrar',
                         style: TextStyle(color: Colors.white)),
