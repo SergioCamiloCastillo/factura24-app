@@ -270,9 +270,11 @@ class _CarouselTabsScreenState extends ConsumerState {
   }
 
   Map<String, dynamic> _getSelectedCardInfo() {
-    final selectedCategory = ref.read(nowCategoriesProvider).categories.firstWhere(
-        (category) => category.id == selectedCard,
-        orElse: () => null!);
+    final selectedCategory = ref
+        .read(nowCategoriesProvider)
+        .categories
+        .firstWhere((category) => category.id == selectedCard,
+            orElse: () => null!);
 
     return {
       'id': selectedCategory.id,
@@ -322,8 +324,9 @@ class _CarouselTabsScreenState extends ConsumerState {
                       categoryNotifier.deleteCategory(categoryToDelete);
                       // Actualiza selectedCard
                       final categoriesData = ref.read(nowCategoriesProvider);
-                      updateSelectedCard(
-                          categoriesData.categories.isNotEmpty ? categoriesData.categories.first.id : '');
+                      updateSelectedCard(categoriesData.categories.isNotEmpty
+                          ? categoriesData.categories.first.id
+                          : '');
                       Navigator.of(context)
                           .pop(); // Cerrar el Dialog después de borrar
                     },
@@ -343,12 +346,14 @@ class _CarouselTabsScreenState extends ConsumerState {
   Widget build(BuildContext context) {
     Timer timer0;
     final categoriesInvoiceState = ref.watch(nowCategoriesProvider);
+
     final invoicesState = ref.watch(invoicesProvider);
     selectedCard = selectedCard.isNotEmpty
         ? selectedCard
         : categoriesInvoiceState.categories.isNotEmpty
             ? categoriesInvoiceState.categories.first.id
             : '';
+
     List<Map<String, dynamic>> matchingColorsData =
         categoriesInvoiceState.categories.map((category) {
       var colorData = colors.firstWhere(
@@ -388,6 +393,9 @@ class _CarouselTabsScreenState extends ConsumerState {
                       },
                       onTap: () {
                         updateSelectedCard(category.id);
+                        final notifier =
+                            ref.read(nowCategoriesProvider.notifier);
+                        notifier.changeCategorySelected(category.id);
                       },
                       child: SingleChildScrollView(
                         child: SizedBox(

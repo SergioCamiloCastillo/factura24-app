@@ -2,7 +2,7 @@ class InvoiceEntity {
   final String id;
   final String description;
   final int userId;
-  final int categoryId;
+  final String categoryId;
   final String createdAt;
   final String? attachmentUrl;
 

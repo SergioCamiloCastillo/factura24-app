@@ -1,5 +1,6 @@
 import 'package:factura24/features/invoice/domain/entities/invoice_entity.dart';
 import 'package:factura24/features/invoice/domain/repositories/invoices_repository.dart';
+import 'package:factura24/features/invoice/presentation/providers/categories_invoices_provider.dart';
 import 'package:factura24/features/invoice/presentation/providers/invoice_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,20 +8,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final invoicesProvider =
     StateNotifierProvider<InvoicesNotifier, InvoicesState>((ref) {
   final invoicesRepository = ref.watch(invoiceRepositoryProvider);
-  return InvoicesNotifier(invoicesRepository: invoicesRepository);
+  final categoryInvoiceState =
+      ref.watch(nowCategoriesProvider); // Get CategoryInvoiceState
+
+  return InvoicesNotifier(
+      invoicesRepository: invoicesRepository,
+      categoryInvoiceState: categoryInvoiceState);
 });
 
 //state notifier provider
 
 class InvoicesNotifier extends StateNotifier<InvoicesState> {
   final InvoicesRepository invoicesRepository;
-  InvoicesNotifier({required this.invoicesRepository})
-      : super(InvoicesState()) {
+  final CategoryInvoiceState categoryInvoiceState;
+  InvoicesNotifier({
+    required this.invoicesRepository,
+    required this.categoryInvoiceState,
+  }) : super(InvoicesState()) {
     loadInvoices();
   }
 
   Future loadInvoices() async {
-    final invoices = await invoicesRepository.getInvoicesByCategoryId('1');
+    final selectedCategoryId = categoryInvoiceState.selectedCategory;
+    final invoices =
+        await invoicesRepository.getInvoicesByCategoryId(selectedCategoryId);
     state = state.copyWith(invoices: [...state.invoices, ...invoices]);
   }
 }

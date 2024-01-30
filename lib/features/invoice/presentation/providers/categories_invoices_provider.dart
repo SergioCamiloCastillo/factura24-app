@@ -55,8 +55,8 @@ class CategoryInvoiceNotifier extends StateNotifier<CategoryInvoiceState> {
     );
   }
 
-  Future<void> _changeCategorySelected(String newCategorySelected) async {
-    state = state.copyWith(selectedCategory: newCategorySelected);
+  Future<void> changeCategorySelected(String idCategorySelected) async {
+    state = state.copyWith(selectedCategory: idCategorySelected);
   }
 
   Future<void> _loadCategoriesFromStorage() async {
