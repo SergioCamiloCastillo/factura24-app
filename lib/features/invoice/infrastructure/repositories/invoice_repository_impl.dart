@@ -13,7 +13,7 @@ class InvoiceRepositoryImpl extends InvoicesRepository {
   }
 
   @override
-  Future<List<InvoiceEntity>> getInvoicesByCategoryId(int categoryId) async {
+  Future<List<InvoiceEntity>> getInvoicesByCategoryId(String categoryId) async {
     return datasource.getInvoicesByCategoryId(categoryId);
   }
 
