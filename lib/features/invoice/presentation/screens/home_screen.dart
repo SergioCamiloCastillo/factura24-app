@@ -270,7 +270,7 @@ class _CarouselTabsScreenState extends ConsumerState {
   }
 
   Map<String, dynamic> _getSelectedCardInfo() {
-    final selectedCategory = ref.read(nowCategoriesProvider).firstWhere(
+    final selectedCategory = ref.read(nowCategoriesProvider).categories.firstWhere(
         (category) => category.id == selectedCard,
         orElse: () => null!);
 
@@ -321,9 +321,9 @@ class _CarouselTabsScreenState extends ConsumerState {
                       // Lógica para borrar aquí
                       categoryNotifier.deleteCategory(categoryToDelete);
                       // Actualiza selectedCard
-                      final categories = ref.read(nowCategoriesProvider);
+                      final categoriesData = ref.read(nowCategoriesProvider);
                       updateSelectedCard(
-                          categories.isNotEmpty ? categories.first.id : '');
+                          categoriesData.categories.isNotEmpty ? categoriesData.categories.first.id : '');
                       Navigator.of(context)
                           .pop(); // Cerrar el Dialog después de borrar
                     },
@@ -346,11 +346,11 @@ class _CarouselTabsScreenState extends ConsumerState {
     final invoicesState = ref.watch(invoicesProvider);
     selectedCard = selectedCard.isNotEmpty
         ? selectedCard
-        : categoriesInvoiceState.isNotEmpty
-            ? categoriesInvoiceState.first.id
+        : categoriesInvoiceState.categories.isNotEmpty
+            ? categoriesInvoiceState.categories.first.id
             : '';
     List<Map<String, dynamic>> matchingColorsData =
-        categoriesInvoiceState.map((category) {
+        categoriesInvoiceState.categories.map((category) {
       var colorData = colors.firstWhere(
           (colorMap) => colorMap['nameColor'] == category.color,
           orElse: () => null!);
@@ -361,7 +361,7 @@ class _CarouselTabsScreenState extends ConsumerState {
             }; // Si hay coincidencia, devuelve el color correspondiente, de lo contrario, negro
     }).toList();
 
-    return categoriesInvoiceState.isNotEmpty
+    return categoriesInvoiceState.categories.isNotEmpty
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -373,9 +373,9 @@ class _CarouselTabsScreenState extends ConsumerState {
                         width: 6.0); // Espacio horizontal entre las tarjetas
                   },
                   scrollDirection: Axis.horizontal,
-                  itemCount: categoriesInvoiceState.length,
+                  itemCount: categoriesInvoiceState.categories.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final category = categoriesInvoiceState[index];
+                    final category = categoriesInvoiceState.categories[index];
                     return GestureDetector(
                       onLongPress: () {
                         final timer = Timer(
