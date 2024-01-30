@@ -29,7 +29,6 @@ class CategoryInvoiceNotifier extends StateNotifier<CategoryInvoiceState> {
   }) : super(CategoryInvoiceState());
 
   Future<void> loadCategories() async {
-    final categories = await fetchCategories();
     _loadCategoriesFromStorage();
   }
 
@@ -70,6 +69,7 @@ class CategoryInvoiceNotifier extends StateNotifier<CategoryInvoiceState> {
               .map((json) => CategoryInvoiceEntity.fromJson(json))),
           selectedCategory: state.selectedCategory,
         );
+        changeCategorySelected(state.categories[0].id);
       }
     }
   }

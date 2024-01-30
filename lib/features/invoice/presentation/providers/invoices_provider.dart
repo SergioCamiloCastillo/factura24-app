@@ -25,10 +25,10 @@ class InvoicesNotifier extends StateNotifier<InvoicesState> {
     required this.invoicesRepository,
     required this.categoryInvoiceState,
   }) : super(InvoicesState()) {
-    loadInvoices();
+    loadInvoicesById();
   }
 
-  Future loadInvoices() async {
+  Future loadInvoicesById() async {
     final selectedCategoryId = categoryInvoiceState.selectedCategory;
     final invoices =
         await invoicesRepository.getInvoicesByCategoryId(selectedCategoryId);
