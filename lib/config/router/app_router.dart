@@ -9,12 +9,14 @@ final appRouter = GoRouter(routes: [
       builder: (context, state) => const HomeScreen()),
   GoRoute(
     path:
-        '/invoice/:categoryInvoiceId/:categoryInvoiceColor/:categoryInvoiceTitle',
+        '/invoice/:categoryInvoiceId/:categoryInvoiceColor/:categoryInvoiceTitle/:idInvoice',
     name: 'invoice',
     builder: (context, state) => InvoiceScreen(
         categoryInvoiceId: state.pathParameters['categoryInvoiceId'] ?? 'no-id',
         categoryInvoiceColor:
             state.pathParameters['categoryInvoiceColor'] ?? 'no-color',
-        categoryInvoiceTitle: state.pathParameters['categoryInvoiceTitle'] ?? ''),
+        categoryInvoiceTitle:
+            state.pathParameters['categoryInvoiceTitle'] ?? '',
+        idInvoice: state.pathParameters['idInvoice'] ?? ''),
   ),
 ]);

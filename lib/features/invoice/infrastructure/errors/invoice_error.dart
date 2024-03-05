@@ -1,0 +1,1 @@
+class InvoiceNotFoundError implements Exception {}

@@ -481,9 +481,16 @@ class _CarouselTabsScreenState extends ConsumerState {
                   itemCount: invoicesState.invoices.length,
                   itemBuilder: (BuildContext context, int index) {
                     final invoice = invoicesState.invoices[index];
-                    return ListTile(
-                      title: Text(invoice.description),
-                      subtitle: Text(invoice.description),
+                    return GestureDetector(
+                      onTap: () {
+                        final selectedCardInfo = _getSelectedCardInfo();
+                        context.push(
+                            '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}/${invoice.id}');
+                      },
+                      child: ListTile(
+                        title: Text(invoice.description),
+                        subtitle: Text(invoice.description),
+                      ),
                     );
                   },
                 ),
@@ -501,7 +508,7 @@ class _CarouselTabsScreenState extends ConsumerState {
                     onPressed: () {
                       final selectedCardInfo = _getSelectedCardInfo();
                       context.push(
-                          '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}');
+                          '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}/${selectedCardInfo['id']}');
                     },
                     child: const Icon(
                       Icons.add,

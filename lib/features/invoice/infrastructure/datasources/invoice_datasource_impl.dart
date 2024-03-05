@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:factura24/features/invoice/domain/datasources/invoices_datasource.dart';
 import 'package:factura24/features/invoice/domain/entities/invoice_entity.dart';
+import 'package:factura24/features/invoice/infrastructure/errors/invoice_error.dart';
 import 'package:factura24/features/invoice/infrastructure/mapper/invoice_mapper.dart';
 import 'package:factura24/features/invoice/infrastructure/models/invoice/invoice_model.dart';
 import 'package:factura24/features/shared/infrastructure/services/key_value_storage_service.dart';
+import 'package:factura24/features/shared/infrastructure/services/key_value_storage_service_impl.dart';
 
 class InvoiceDatasourceImpl extends InvoicesDatasource {
   @override
@@ -19,7 +23,7 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
         "id": 'dijfeijfei',
         "description": "Factura 1",
         "userId": 1,
-        "categoryId": '6578dc0e7c1305ec',
+        "categoryId": '-5c933edc6efca06',
         "createdAt": "2021-09-01T00:00:00.000Z",
         "attachmentUrl": "https://factura24.com/factura1.pdf"
       },
@@ -27,7 +31,7 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
         "id": 'dijfeijfei',
         "description": "Factura 2",
         "userId": 1,
-        "categoryId": '-686bf5861781daaf',
+        "categoryId": '-5c933edc6efca06',
         "createdAt": "2021-09-01T00:00:00.000Z",
         "attachmentUrl": "https://factura24.com/factura1.pdf"
       }
@@ -41,19 +45,39 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
 
   @override
   Future<InvoiceEntity> createInvoice(Map<String, dynamic> invoiceLike) {
-    // TODO: implement createInvoice
-    throw UnimplementedError();
+    print('llega aquiiii');
+    final keyValueStorageService = KeyValueStorageServiceImpl();
+    try {
+      final encodedInvoices =
+          keyValueStorageService.getKeyValue<String>('invoices_data');
+      final decodedInvoices = jsonDecode(encodedInvoices as String);
+      final invoice = InvoiceMapper.jsonToEntity(invoiceLike);
+      final newInvoices = [...decodedInvoices, invoice];
+      keyValueStorageService.setKeyValue(
+          'invoices_data', jsonEncode(newInvoices));
+      return invoice;
+    } catch (e) {
+      throw UnimplementedError('No se pudo crear la factura');
+    }
   }
 
   @override
   Future<InvoiceEntity> getInvoiceById(String id) async {
-    return InvoiceMapper.jsonToEntity({
-      "id": 'dijfeijfei',
-      "description": "Factura 1",
-      "userId": 1,
-      "categoryId": 1,
-      "createdAt": "2021-09-01T00:00:00.000Z",
-      "attachmentUrl": "https://factura24.com/factura1.pdf"
-    });
+    final keyValueStorageService = KeyValueStorageServiceImpl();
+    try {
+      final encodedInvoices =
+          await keyValueStorageService.getKeyValue<String>('invoices_data');
+
+      final decodedInvoices = jsonDecode(encodedInvoices!);
+      final invoice = decodedInvoices
+          .firstWhere((invoice) => invoice['id'] == id, orElse: () => {})
+          .map<InvoiceEntity>((invoice) => InvoiceMapper.jsonToEntity(invoice));
+      if (!invoice) {
+        throw InvoiceNotFoundError();
+      }
+      return invoice;
+    } catch (e) {
+      throw UnimplementedError('No se encontró la factura');
+    }
   }
 }

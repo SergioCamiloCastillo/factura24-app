@@ -3,26 +3,26 @@ import 'package:factura24/features/invoice/domain/repositories/invoices_reposito
 import 'package:factura24/features/invoice/presentation/providers/invoice_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final InvoiceProvider = StateNotifierProvider.autoDispose
+final invoiceProvider = StateNotifierProvider.autoDispose
     .family<InvoiceNotifier, InvoiceState, String>((ref, invoiceId) {
   final invoiceRepository = ref.watch(invoiceRepositoryProvider);
   return InvoiceNotifier(
-      invoiceRepository: invoiceRepository, invoiceId: invoiceId);
+      invoicesRepository: invoiceRepository, invoiceId: invoiceId);
 });
 
 class InvoiceNotifier extends StateNotifier<InvoiceState> {
-  final InvoicesRepository invoiceRepository;
-  InvoiceNotifier({required this.invoiceRepository, required String invoiceId})
+  final InvoicesRepository invoicesRepository;
+  InvoiceNotifier({required this.invoicesRepository, required String invoiceId})
       : super(InvoiceState(id: invoiceId)) {
     loadInvoice();
   }
-
   Future<void> loadInvoice() async {
     try {
-      final invoice = await invoiceRepository.getInvoiceById(state.id);
-      state = state.copyWith(invoice: invoice, isLoading: false);
+      final invoice = await invoicesRepository.getInvoiceById(state.id);
+
+      state = state.copyWith(isLoading: false, invoice: invoice);
     } catch (e) {
-      print('error es=> e');
+      print(e);
     }
   }
 }
