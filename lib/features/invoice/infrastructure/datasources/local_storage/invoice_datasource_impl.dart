@@ -23,7 +23,7 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
         "id": 'dijfeijfei',
         "description": "Factura 1",
         "userId": 1,
-        "categoryId": '-5c933edc6efca06',
+        "categoryId": '75be9ded34326125',
         "createdAt": "2021-09-01T00:00:00.000Z",
         "attachmentUrl": "https://factura24.com/factura1.pdf"
       },
@@ -31,7 +31,7 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
         "id": 'dijfeijfei',
         "description": "Factura 2",
         "userId": 1,
-        "categoryId": '-5c933edc6efca06',
+        "categoryId": '75be9ded34326125',
         "createdAt": "2021-09-01T00:00:00.000Z",
         "attachmentUrl": "https://factura24.com/factura1.pdf"
       }
@@ -65,6 +65,9 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
   Future<InvoiceEntity> getInvoiceById(String id) async {
     final keyValueStorageService = KeyValueStorageServiceImpl();
     try {
+      print(
+        'que contiene esto=>${await keyValueStorageService.getKeyValue<String>('invoices_data')}',
+      );
       final encodedInvoices =
           await keyValueStorageService.getKeyValue<String>('invoices_data');
 

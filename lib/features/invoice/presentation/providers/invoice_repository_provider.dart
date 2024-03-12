@@ -2,8 +2,8 @@
 
 import 'package:factura24/features/invoice/domain/repositories/categories_invoice_repository.dart';
 import 'package:factura24/features/invoice/domain/repositories/invoices_repository.dart';
-import 'package:factura24/features/invoice/infrastructure/datasources/category_invoice_datasource_impl.dart';
-import 'package:factura24/features/invoice/infrastructure/datasources/invoice_datasource_impl.dart';
+import 'package:factura24/features/invoice/infrastructure/datasources/local_storage/category_invoice_datasource_impl.dart';
+import 'package:factura24/features/invoice/infrastructure/datasources/local_storage/invoice_datasource_impl.dart';
 import 'package:factura24/features/invoice/infrastructure/repositories/categories_invoice_impl.dart';
 import 'package:factura24/features/invoice/infrastructure/repositories/invoice_repository_impl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

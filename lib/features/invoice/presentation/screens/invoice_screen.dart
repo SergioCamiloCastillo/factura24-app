@@ -1,6 +1,6 @@
 import 'package:factura24/features/invoice/presentation/providers/invoice_provider.dart';
 import 'package:factura24/features/shared/infrastructure/services/colorsMatchCategory.dart';
-import 'package:factura24/features/shared/widgets/custom_invoice_input.dart';
+import 'package:factura24/features/shared/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,6 +27,13 @@ class InvoiceScreen extends ConsumerWidget {
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ),
-        body: Column(children: [Text(invoiceState.invoice!.description), const CustomInvoiceInput()]));
+        body: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 25.0),
+          child: Column(children: [
+            CustomInvoiceInput(
+              label: 'Descripción',
+            )
+          ]),
+        ));
   }
 }
