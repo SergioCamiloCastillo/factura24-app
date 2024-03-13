@@ -8,9 +8,12 @@ class CustomInvoiceInput extends StatelessWidget {
   final Function(String)? onChanged;
   final Function(String)? onFieldSubmitted;
   final String? Function(String?)? validator;
+  final int? maxLength;
+  final int? maxLines;
+  final Color? borderColor;
 
   const CustomInvoiceInput({
-    super.key,
+    Key? key,
     this.label,
     this.hint,
     this.errorMessage,
@@ -18,46 +21,79 @@ class CustomInvoiceInput extends StatelessWidget {
     this.onChanged,
     this.onFieldSubmitted,
     this.validator,
-  });
+    this.maxLength,
+    this.maxLines,
+     this.borderColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    final border = OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.transparent),
-        borderRadius: BorderRadius.circular(40));
 
-    const borderRadius = Radius.circular(15);
+    const borderRadius = Radius.circular(10);
 
     return Container(
-      padding: const EdgeInsets.only(bottom: 8),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(borderRadius),
       ),
-      child: TextFormField(
-        onChanged: onChanged,
-        onFieldSubmitted: onFieldSubmitted,
-        validator: validator,
-        keyboardType: keyboardType,
-        style: const TextStyle(fontSize: 15, color: Colors.black54),
-        decoration: InputDecoration(
-          floatingLabelStyle: const TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
-          enabledBorder: border,
-          focusedBorder: border,
-          errorBorder: border.copyWith(
-              borderSide: const BorderSide(color: Colors.transparent)),
-          focusedErrorBorder: border.copyWith(
-              borderSide: const BorderSide(color: Colors.transparent)),
-          isDense: true,
-          label: label != null ? Text(label!) : null,
-          hintText: hint,
-          errorText: errorMessage,
-          focusColor: colors.primary,
-          // icon: Icon( Icons.supervised_user_circle_outlined, color: colors.primary, )
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (label != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Text(
+                label!,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          TextFormField(
+            onChanged: onChanged,
+            onFieldSubmitted: onFieldSubmitted,
+            validator: validator,
+            keyboardType: keyboardType,
+            maxLines: maxLines,
+            maxLength: maxLength,
+            style: const TextStyle(fontSize: 15, color: Colors.black54),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 15,
+                horizontal: 15,
+              ),
+              floatingLabelStyle: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: borderColor ?? colors.primary),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              isDense: true,
+              hintText: hint,
+              errorText: errorMessage,
+              focusColor: colors.primary,
+            ),
+          ),
+        ],
       ),
     );
   }

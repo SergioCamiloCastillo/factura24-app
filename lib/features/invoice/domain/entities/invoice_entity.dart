@@ -1,9 +1,9 @@
 class InvoiceEntity {
   final String id;
-  final String description;
+  final String? description;
   final int userId;
   final String categoryId;
-  final String createdAt;
+  final DateTime createdAt;
   final String? attachmentUrl;
 
   InvoiceEntity({

@@ -19,6 +19,8 @@ class InvoiceScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final invoiceState = ref.watch(invoiceProvider(idInvoice));
+    final Color borderColor =
+        getColorByName(categoryInvoiceColor).withAlpha(400);
     return Scaffold(
         appBar: AppBar(
           backgroundColor: getColorByName(categoryInvoiceColor).withAlpha(400),
@@ -27,13 +29,18 @@ class InvoiceScreen extends ConsumerWidget {
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ),
-        body: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 25.0),
-          child: Column(children: [
-            CustomInvoiceInput(
-              label: 'Descripción',
-            )
-          ]),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
+            child: Column(children: [
+              CustomInvoiceInput(
+                label: 'Descripción',
+                maxLength: 200,
+                maxLines: 5,
+                borderColor: borderColor,
+              )
+            ]),
+          ),
         ));
   }
 }

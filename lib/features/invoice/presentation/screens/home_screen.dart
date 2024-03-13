@@ -488,8 +488,8 @@ class _CarouselTabsScreenState extends ConsumerState {
                             '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}/${invoice.id}');
                       },
                       child: ListTile(
-                        title: Text(invoice.description),
-                        subtitle: Text(invoice.description),
+                        title: Text(invoice.createdAt.toString()),
+                        subtitle: Text(invoice.description ?? ''),
                       ),
                     );
                   },
