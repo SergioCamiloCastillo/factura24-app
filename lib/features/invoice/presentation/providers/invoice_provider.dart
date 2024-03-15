@@ -4,19 +4,43 @@ import 'package:factura24/features/invoice/presentation/providers/invoice_reposi
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final invoiceProvider = StateNotifierProvider.autoDispose
-    .family<InvoiceNotifier, InvoiceState, String>((ref, invoiceId) {
-  final invoiceRepository = ref.watch(invoiceRepositoryProvider);
-  return InvoiceNotifier(
-      invoicesRepository: invoiceRepository, invoiceId: invoiceId);
-});
+    .family<InvoiceNotifier, InvoiceState, Map<String, String>>(
+  (ref, params) {
+    final invoiceRepository = ref.watch(invoiceRepositoryProvider);
+    final categoryId = params['categoryId']; // Obtener categoryId del parámetro
+    return InvoiceNotifier(
+      invoicesRepository: invoiceRepository,
+      invoiceId: params['invoiceId']!,
+      categoryId: categoryId!,
+    );
+  },
+);
 
 class InvoiceNotifier extends StateNotifier<InvoiceState> {
   final InvoicesRepository invoicesRepository;
-  InvoiceNotifier({required this.invoicesRepository, required String invoiceId})
-      : super(InvoiceState(id: invoiceId)) {
+  final String categoryId;
+  InvoiceNotifier({
+    required this.invoicesRepository,
+    required String invoiceId,
+    required this.categoryId, // Incluir categoryId en el constructor
+  }) : super(InvoiceState(id: invoiceId)) {
     loadInvoice();
   }
+
+  InvoiceEntity _newEmptyInvoice() {
+    return InvoiceEntity(
+        id: 'new',
+        description: '',
+        createdAt: DateTime.now(),
+        userId: 1,
+        categoryId: categoryId);
+  }
+
   Future<void> loadInvoice() async {
+    if (state.id == 'new') {
+      state = state.copyWith(invoice: _newEmptyInvoice(), isLoading: false);
+      return;
+    }
     try {
       final invoice = await invoicesRepository.getInvoiceById(state.id);
 

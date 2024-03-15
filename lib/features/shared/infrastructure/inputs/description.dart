@@ -14,7 +14,6 @@ class Description extends FormzInput<String, DescriptionError> {
   String? get errorMessage {
     if (isValid || isPure) return null;
 
-    if (displayError == DescriptionError.empty) return 'El campo es requerido';
 
     return null;
   }

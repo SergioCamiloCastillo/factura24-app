@@ -11,25 +11,26 @@ class CustomInvoiceInput extends StatelessWidget {
   final int? maxLength;
   final int? maxLines;
   final Color? borderColor;
+  final String? initialValue;
 
-  const CustomInvoiceInput({
-    Key? key,
-    this.label,
-    this.hint,
-    this.errorMessage,
-    this.keyboardType = TextInputType.text,
-    this.onChanged,
-    this.onFieldSubmitted,
-    this.validator,
-    this.maxLength,
-    this.maxLines,
-     this.borderColor,
-  }) : super(key: key);
+  const CustomInvoiceInput(
+      {Key? key,
+      this.label,
+      this.hint,
+      this.errorMessage,
+      this.keyboardType = TextInputType.text,
+      this.onChanged,
+      this.onFieldSubmitted,
+      this.validator,
+      this.maxLength,
+      this.maxLines,
+      this.borderColor,
+      this.initialValue})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-
 
     const borderRadius = Radius.circular(10);
 
@@ -60,6 +61,7 @@ class CustomInvoiceInput extends StatelessWidget {
             keyboardType: keyboardType,
             maxLines: maxLines,
             maxLength: maxLength,
+            initialValue: initialValue,
             style: const TextStyle(fontSize: 15, color: Colors.black54),
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(

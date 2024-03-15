@@ -508,7 +508,7 @@ class _CarouselTabsScreenState extends ConsumerState {
                     onPressed: () {
                       final selectedCardInfo = _getSelectedCardInfo();
                       context.push(
-                          '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}/${selectedCardInfo['id']}');
+                          '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}/new');
                     },
                     child: const Icon(
                       Icons.add,
