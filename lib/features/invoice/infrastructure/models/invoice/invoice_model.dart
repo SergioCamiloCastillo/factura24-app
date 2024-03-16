@@ -11,7 +11,7 @@ class InvoiceResponse {
     final String description;
     final int userId;
     final int categoryId;
-    final DateTime createdAt;
+    final String createdAt;
     final String attachmentUrl;
 
     InvoiceResponse({
@@ -28,7 +28,7 @@ class InvoiceResponse {
         description: json["description"],
         userId: json["userId"],
         categoryId: json["categoryId"],
-        createdAt: DateTime.parse(json["createdAt"]),
+        createdAt: DateTime.parse(json["createdAt"]).toString(),
         attachmentUrl: json["attachmentUrl"],
     );
 
@@ -37,7 +37,7 @@ class InvoiceResponse {
         "description": description,
         "userId": userId,
         "categoryId": categoryId,
-        "createdAt": createdAt.toIso8601String(),
+        "createdAt": createdAt.toString(),
         "attachmentUrl": attachmentUrl,
     };
 }

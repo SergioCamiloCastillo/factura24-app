@@ -12,7 +12,7 @@ final appRouter = GoRouter(routes: [
         '/invoice/:categoryInvoiceId/:categoryInvoiceColor/:categoryInvoiceTitle/:idInvoice',
     name: 'invoice',
     builder: (context, state) => InvoiceScreen(
-        categoryInvoiceId: state.pathParameters['categoryInvoiceId'] ?? 'no-id',
+        categoryInvoiceId: state.pathParameters['categoryInvoiceId'] ?? 'new',
         categoryInvoiceColor:
             state.pathParameters['categoryInvoiceColor'] ?? 'no-color',
         categoryInvoiceTitle:

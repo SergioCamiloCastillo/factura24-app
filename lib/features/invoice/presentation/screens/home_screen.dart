@@ -1,15 +1,20 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:gallery_image_viewer/gallery_image_viewer.dart';
+import 'package:intl/intl.dart';
 
 import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
 import 'package:factura24/features/invoice/presentation/providers/categories_invoices_provider.dart';
+import 'package:factura24/features/invoice/presentation/providers/form/invoice_form_provider.dart';
 import 'package:factura24/features/invoice/presentation/providers/invoices_provider.dart';
 import 'package:factura24/features/shared/infrastructure/services/colorsMatchCategory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:math';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends ConsumerWidget {
   static const name = "home-screen";
@@ -54,21 +59,16 @@ class HomeScreen extends ConsumerWidget {
   }
 
   String generateHash(String input) {
-    // Convierte la cadena de entrada a bytes
     List<int> bytes = utf8.encode(input);
 
-    // Inicializa el valor del hash con un número aleatorio
     int hash = Random().nextInt(1000);
 
-    // Factor de mezcla para mejorar la calidad del hash
     const mixFactor = 31;
 
-    // Aplica la función hash sumando y mezclando los valores de los bytes
     for (int byte in bytes) {
       hash = (hash * mixFactor) ^ byte;
     }
 
-    // Convierte el hash a una cadena hexadecimal
     String hexHash = hash.toRadixString(16);
 
     return hexHash;
@@ -286,7 +286,7 @@ class _CarouselTabsScreenState extends ConsumerState {
   String selectedCard = '';
 
   final List<Map<String, dynamic>> colors = globalColors;
-  void updateSelectedCard(String index) {
+  void updateSelectedCard(String index) async {
     setState(() {
       selectedCard = index;
     });
@@ -295,6 +295,7 @@ class _CarouselTabsScreenState extends ConsumerState {
   void _showModal(BuildContext context, WidgetRef ref,
       CategoryInvoiceEntity categoryToDelete) {
     final categoryNotifier = ref.read(nowCategoriesProvider.notifier);
+    final invoiceNotifier = ref.read(invoicesProvider.notifier);
     // Show modal after a 2-second delay
     showDialog(
       context: context,
@@ -313,7 +314,7 @@ class _CarouselTabsScreenState extends ConsumerState {
                       Navigator.of(context)
                           .pop(); // Cerrar el Dialog después de editar
                     },
-                    child: const Text('Editar'),
+                    child: const Text('Cancelar'),
                   ),
                   ElevatedButton(
                     style: ButtonStyle(
@@ -335,12 +336,12 @@ class _CarouselTabsScreenState extends ConsumerState {
                         content: const Text('Categoría eliminada exitosamente',
                             style: TextStyle(fontWeight: FontWeight.w500)),
                       );
-
+                      context.pushReplacement('/');
                       // Find the ScaffoldMessenger in the widget tree
                       // and use it to show a SnackBar.
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
-                    child: const Text('Borrar',
+                    child: const Text('Eliminar',
                         style: TextStyle(color: Colors.white)),
                   )
                 ],
@@ -354,7 +355,6 @@ class _CarouselTabsScreenState extends ConsumerState {
 
   @override
   Widget build(BuildContext context) {
-    Timer timer0;
     final categoriesInvoiceState = ref.watch(nowCategoriesProvider);
 
     final invoicesState = ref.watch(invoicesProvider);
@@ -381,7 +381,7 @@ class _CarouselTabsScreenState extends ConsumerState {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 75.0, // Altura fija para las tarjetas
+                height: 60.0, // Altura fija para las tarjetas
                 child: ListView.separated(
                   separatorBuilder: (BuildContext context, int index) {
                     return const SizedBox(
@@ -399,7 +399,6 @@ class _CarouselTabsScreenState extends ConsumerState {
                             _showModal(context, ref, category);
                           },
                         );
-                        print('Long press');
                       },
                       onTap: () {
                         updateSelectedCard(category.id);
@@ -456,15 +455,6 @@ class _CarouselTabsScreenState extends ConsumerState {
                                         ), // Mantener el color del texto sin opacidad
                                       ),
                                     ),
-                                    const Text(
-                                      '3 facturas',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Color(
-                                          0xff59656F,
-                                        ), // Mantener el color del texto sin opacidad
-                                      ),
-                                    )
                                   ],
                                 ),
                               ),
@@ -477,24 +467,58 @@ class _CarouselTabsScreenState extends ConsumerState {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: invoicesState.invoices.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final invoice = invoicesState.invoices[index];
-                    return GestureDetector(
-                      onTap: () {
-                        final selectedCardInfo = _getSelectedCardInfo();
-                        context.push(
-                            '/invoice/${selectedCardInfo['id']}/${selectedCardInfo['color']}/${selectedCardInfo['title']}/${invoice.id}');
-                      },
-                      child: ListTile(
-                        title: Text(invoice.createdAt.toString()),
-                        subtitle: Text(invoice.description ?? ''),
+                  child: ListView.builder(
+                itemCount: invoicesState.invoices.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final invoice = invoicesState.invoices[index];
+                  String createdAtString = invoice.createdAt;
+                  DateTime createdAt = DateTime.parse(createdAtString);
+                  DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+                  String formattedDate = dateFormat.format(createdAt);
+
+                  return GestureDetector(
+                    onTap: () {
+                      if (invoice.attachmentUrl != null &&
+                          invoice.attachmentUrl!.isNotEmpty) {
+                        print('pudeee=>${invoice.attachmentUrl}');
+                        showImageViewer(
+                            context, FileImage(File(invoice.attachmentUrl!)));
+                      }
+                    },
+                    child: Card(
+                      elevation: 4, // Elevación de la tarjeta
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8), // Márgenes de la tarjeta
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Bordes redondeados
                       ),
-                    );
-                  },
-                ),
-              ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(
+                            16), // Relleno interno de la lista
+                        title: Text(
+                          formattedDate,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(invoice.description ?? ''),
+                        trailing: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                              8), // Bordes redondeados de la imagen
+                          child: Image.file(
+                            File(invoice.attachmentUrl!),
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit
+                                .cover, // Ajustar imagen al tamaño del contenedor
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )),
               Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(

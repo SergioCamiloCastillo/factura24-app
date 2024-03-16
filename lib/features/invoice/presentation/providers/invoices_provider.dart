@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final invoicesProvider =
     StateNotifierProvider<InvoicesNotifier, InvoicesState>((ref) {
   final invoicesRepository = ref.watch(invoiceRepositoryProvider);
+
   final categoryInvoiceState =
       ref.watch(nowCategoriesProvider); // Get CategoryInvoiceState
 
@@ -33,6 +34,16 @@ class InvoicesNotifier extends StateNotifier<InvoicesState> {
     final invoices =
         await invoicesRepository.getInvoicesByCategoryId(selectedCategoryId);
     state = state.copyWith(invoices: [...state.invoices, ...invoices]);
+  }
+
+  Future<bool> deleteInvoiceByCategoryId(String id) async {
+    final result = await invoicesRepository.deleteInvoiceByCategoryId(id);
+    if (result) {
+      state = state.copyWith(
+          invoices:
+              state.invoices.where((element) => element.id != id).toList());
+    }
+    return result;
   }
 }
 

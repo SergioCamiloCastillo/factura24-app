@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:factura24/features/invoice/infrastructure/datasources/local_storage/invoice_datasource_impl.dart';
 import 'package:factura24/features/invoice/presentation/providers/invoice_repository_provider.dart';
 import 'package:factura24/features/invoice/domain/entities/category_invoice_entity.dart';
 import 'package:factura24/features/shared/infrastructure/services/key_value_storage_service.dart';
@@ -43,9 +44,31 @@ class CategoryInvoiceNotifier extends StateNotifier<CategoryInvoiceState> {
           .where((category) => category.id != categoryToDelete.id)
           .toList(),
     );
+    
     await _saveCategoriesToStorage();
   }
+Future<bool> deleteInvoiceByCategoryId(String id) async {
+    try {
+      final keyValueStorageService = KeyValueStorageServiceImpl();
+      final encodedInvoicesFuture =
+          keyValueStorageService.getKeyValue<String>('invoices_data');
+      final encodedInvoices = await encodedInvoicesFuture;
 
+      if (encodedInvoices == null) {
+        throw Exception('No hay facturas almacenadas');
+      }
+
+      final List<dynamic> decodedInvoices = jsonDecode(encodedInvoices) ?? [];
+      final updatedInvoices = decodedInvoices
+          .where((invoice) => invoice['id'] != id)
+          .toList(); // Eliminar la factura con el id especificado
+      keyValueStorageService.setKeyValue(
+          'invoices_data', jsonEncode(updatedInvoices));
+      return true;
+    } catch (e) {
+      throw UnimplementedError('No se pudo eliminar la factura');
+    }
+  }
   Future<void> updateCategory(CategoryInvoiceEntity updatedCategory) async {
     state = state.copyWith(
       categories: state.categories.map((category) {
@@ -59,20 +82,23 @@ class CategoryInvoiceNotifier extends StateNotifier<CategoryInvoiceState> {
   }
 
   Future<void> _loadCategoriesFromStorage() async {
-    final encodedCategories =
-        await keyValueStorageService.getKeyValue<String>('categories_invoice');
-    if (encodedCategories != null) {
-      final decodedCategories = jsonDecode(encodedCategories);
-      if (decodedCategories is List) {
+  final encodedCategories =
+      await keyValueStorageService.getKeyValue<String>('categories_invoice');
+  if (encodedCategories != null) {
+    final decodedCategories = jsonDecode(encodedCategories);
+    if (decodedCategories is List) {
+      List<CategoryInvoiceEntity> categories = List<CategoryInvoiceEntity>.from(decodedCategories
+          .map((json) => CategoryInvoiceEntity.fromJson(json)));
+
+      if (categories.isNotEmpty) {
         state = CategoryInvoiceState(
-          categories: List<CategoryInvoiceEntity>.from(decodedCategories
-              .map((json) => CategoryInvoiceEntity.fromJson(json))),
-          selectedCategory: state.selectedCategory,
+          categories: categories,
+          selectedCategory: categories[0].id,
         );
-        changeCategorySelected(state.categories[0].id);
       }
     }
   }
+}
 
   Future<void> _saveCategoriesToStorage() async {
     final encodedCategories = jsonEncode(

@@ -26,4 +26,9 @@ class InvoiceRepositoryImpl extends InvoicesRepository {
   Future<InvoiceEntity> getInvoiceById(String id) {
     return datasource.getInvoiceById(id);
   }
+  
+  @override
+  Future<bool> deleteInvoiceByCategoryId(String id) {
+    return datasource.deleteInvoiceByCategoryId(id);
+  }
 }

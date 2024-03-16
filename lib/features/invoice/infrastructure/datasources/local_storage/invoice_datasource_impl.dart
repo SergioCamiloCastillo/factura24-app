@@ -18,43 +18,47 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
   @override
   Future<List<InvoiceEntity>> getInvoicesByCategoryId(String categoryId) async {
     print('si llega $categoryId');
-    List invoicesResponse = [
-      {
-        "id": 'dijfeijfei',
-        "description": "Factura 1",
-        "userId": 1,
-        "categoryId": '75be9ded34326125',
-        "createdAt": "2021-09-01T00:00:00.000Z",
-        "attachmentUrl": "https://factura24.com/factura1.pdf"
-      },
-      {
-        "id": 'dijfeijfei',
-        "description": "Factura 2",
-        "userId": 1,
-        "categoryId": '75be9ded34326125',
-        "createdAt": "2021-09-01T00:00:00.000Z",
-        "attachmentUrl": "https://factura24.com/factura1.pdf"
-      }
-    ];
+    final keyValueStorageService = KeyValueStorageServiceImpl();
+    try {
+      final encodedInvoices =
+          await keyValueStorageService.getKeyValue<String>('invoices_data');
+      List<dynamic> decodedInvoices = jsonDecode(encodedInvoices!) ?? [];
+      List<InvoiceEntity> filteredInvoices = decodedInvoices
+          .where((invoice) => invoice['categoryId'] == categoryId)
+          .map<InvoiceEntity>((invoice) => InvoiceMapper.jsonToEntity(invoice))
+          .toList();
 
-    return invoicesResponse
-        .where((invoice) => invoice['categoryId'] == categoryId)
-        .map<InvoiceEntity>((invoice) => InvoiceMapper.jsonToEntity(invoice))
-        .toList();
+      // Ordenar las facturas por fecha
+      filteredInvoices.sort((a, b) =>
+          DateTime.parse(b.createdAt).compareTo(DateTime.parse(a.createdAt)));
+
+      return filteredInvoices;
+    } catch (e) {
+      throw UnimplementedError(
+          'No se pudieron obtener las facturas por categoría');
+    }
   }
 
   @override
-  Future<InvoiceEntity> createInvoice(Map<String, dynamic> invoiceLike) {
+  Future<InvoiceEntity> createInvoice(Map<String, dynamic> invoiceLike) async {
     print('llega aquiiii');
     final keyValueStorageService = KeyValueStorageServiceImpl();
     try {
       final encodedInvoices =
-          keyValueStorageService.getKeyValue<String>('invoices_data');
-      final decodedInvoices = jsonDecode(encodedInvoices as String);
+          await keyValueStorageService.getKeyValue<String>('invoices_data');
+
+      print('hay 1');
+      // Convertir el JSON a una lista de objetos InvoiceEntity
+      List<dynamic> decodedInvoices = jsonDecode(encodedInvoices!) ?? [];
+      print('hay 2');
+
       final invoice = InvoiceMapper.jsonToEntity(invoiceLike);
-      final newInvoices = [...decodedInvoices, invoice];
+      decodedInvoices
+          .add(invoice.toJson()); // Agregar el nuevo invoice a la lista
+
+      // Codificar toda la lista de nuevo a JSON y guardarla en el almacenamiento
       keyValueStorageService.setKeyValue(
-          'invoices_data', jsonEncode(newInvoices));
+          'invoices_data', jsonEncode(decodedInvoices));
       return invoice;
     } catch (e) {
       throw UnimplementedError('No se pudo crear la factura');
@@ -81,6 +85,30 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
       return invoice;
     } catch (e) {
       throw UnimplementedError('No se encontró la factura');
+    }
+  }
+
+  @override
+  Future<bool> deleteInvoiceByCategoryId(String id) async {
+    try {
+      final keyValueStorageService = KeyValueStorageServiceImpl();
+      final encodedInvoicesFuture =
+          keyValueStorageService.getKeyValue<String>('invoices_data');
+      final encodedInvoices = await encodedInvoicesFuture;
+
+      if (encodedInvoices == null) {
+        throw Exception('No hay facturas almacenadas');
+      }
+
+      final List<dynamic> decodedInvoices = jsonDecode(encodedInvoices) ?? [];
+      final updatedInvoices = decodedInvoices
+          .where((invoice) => invoice['id'] != id)
+          .toList(); // Eliminar la factura con el id especificado
+      keyValueStorageService.setKeyValue(
+          'invoices_data', jsonEncode(updatedInvoices));
+      return true;
+    } catch (e) {
+      throw UnimplementedError('No se pudo eliminar la factura');
     }
   }
 }

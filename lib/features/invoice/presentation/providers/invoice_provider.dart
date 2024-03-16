@@ -31,7 +31,7 @@ class InvoiceNotifier extends StateNotifier<InvoiceState> {
     return InvoiceEntity(
         id: 'new',
         description: '',
-        createdAt: DateTime.now(),
+        createdAt: DateTime.now().toString(),
         userId: 1,
         categoryId: categoryId);
   }
