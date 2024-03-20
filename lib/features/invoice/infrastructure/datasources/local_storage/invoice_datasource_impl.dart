@@ -22,7 +22,10 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
     try {
       final encodedInvoices =
           await keyValueStorageService.getKeyValue<String>('invoices_data');
-      List<dynamic> decodedInvoices = jsonDecode(encodedInvoices!) ?? [];
+      if (encodedInvoices == null) {
+        return [];
+      }
+      List<dynamic> decodedInvoices = jsonDecode(encodedInvoices) ?? [];
       List<InvoiceEntity> filteredInvoices = decodedInvoices
           .where((invoice) => invoice['categoryId'] == categoryId)
           .map<InvoiceEntity>((invoice) => InvoiceMapper.jsonToEntity(invoice))
@@ -48,8 +51,11 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
           await keyValueStorageService.getKeyValue<String>('invoices_data');
 
       print('hay 1');
+      List<dynamic> decodedInvoices = [];
+      if (encodedInvoices != null) {
+        decodedInvoices = jsonDecode(encodedInvoices) ?? [];
+      }
       // Convertir el JSON a una lista de objetos InvoiceEntity
-      List<dynamic> decodedInvoices = jsonDecode(encodedInvoices!) ?? [];
       print('hay 2');
 
       final invoice = InvoiceMapper.jsonToEntity(invoiceLike);
