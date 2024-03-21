@@ -5,16 +5,14 @@ import 'package:factura24/features/invoice/presentation/providers/invoice_reposi
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // el invoicesProvider, provee el estado de abajo de manera global, junto con el notifier
-final invoicesProvider =
-    StateNotifierProvider<InvoicesNotifier, InvoicesState>((ref) {
+final invoicesProvider = StateNotifierProvider<InvoicesNotifier, InvoicesState>((ref) {
   final invoicesRepository = ref.watch(invoiceRepositoryProvider);
-
-  final categoryInvoiceState =
-      ref.watch(nowCategoriesProvider); // Get CategoryInvoiceState
+  final categoryInvoiceState = ref.watch(nowCategoriesProvider); 
 
   return InvoicesNotifier(
-      invoicesRepository: invoicesRepository,
-      categoryInvoiceState: categoryInvoiceState);
+    invoicesRepository: invoicesRepository,
+    categoryInvoiceState: categoryInvoiceState,
+  );
 });
 
 //state notifier provider
@@ -22,12 +20,17 @@ final invoicesProvider =
 class InvoicesNotifier extends StateNotifier<InvoicesState> {
   final InvoicesRepository invoicesRepository;
   final CategoryInvoiceState categoryInvoiceState;
+
   InvoicesNotifier({
     required this.invoicesRepository,
     required this.categoryInvoiceState,
   }) : super(InvoicesState()) {
-    loadInvoicesById();
+    if (categoryInvoiceState.selectedCategory.isNotEmpty) {
+      loadInvoicesById();
+    }
   }
+
+
 
   Future loadInvoicesById() async {
     final selectedCategoryId = categoryInvoiceState.selectedCategory;

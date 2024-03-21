@@ -7,6 +7,7 @@ import 'package:factura24/features/shared/infrastructure/services/colorsMatchCat
 import 'package:factura24/features/shared/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 class InvoiceScreen extends ConsumerWidget {
@@ -38,9 +39,9 @@ class InvoiceScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: getColorByName(categoryInvoiceColor).withAlpha(400),
-        title: const Text(
+        title: Text(
           'Crear factura',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
       ),
       body: SingleChildScrollView(
@@ -115,9 +116,9 @@ class InvoiceScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          child: const Text(
+          child: Text(
             'Guardar factura',
-            style: TextStyle(fontSize: 16, color: Colors.white),
+            style: TextStyle(fontSize: 16.sp, color: Colors.white),
           ),
         ),
       ),

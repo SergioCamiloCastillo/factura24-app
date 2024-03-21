@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gallery_image_viewer/gallery_image_viewer.dart';
 import 'package:intl/intl.dart';
 
@@ -29,28 +30,28 @@ class HomeScreen extends ConsumerWidget {
           actions: [
             GestureDetector(
                 onTap: () => _dialogBuilder(context, ref),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.add_circle_outline,
                       color: Color(0xFF06B981),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 5,
                     ),
                     Text('Agregar categoría',
                         style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF06B981))),
-                    SizedBox(
+                            color: const Color(0xFF06B981))),
+                    const SizedBox(
                       width: 5,
                     )
                   ],
                 )),
           ],
-          title: const Text('Facturas',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+          title: Text('Facturas',
+              style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold)),
         ),
         body: const Padding(
           padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -95,9 +96,9 @@ class HomeScreen extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          title: const Text(
+          title: Text(
             'Agrega nueva categoría de factura',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -554,15 +555,15 @@ class _CarouselTabsScreenState extends ConsumerState {
                 const SizedBox(
                   height: 20,
                 ),
-                const Text('!Sin categorías de facturas!',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const Padding(
-                  padding: EdgeInsets.all(15.0),
+                Text('!Sin categorías de facturas!',
+                    style: TextStyle(
+                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
                   child: Text(
                     'Por favor, toca el botón de agregar categoría para crear una nueva categoría de factura',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Color(0xFF59656F)),
+                    style: TextStyle(fontSize: 13.sp, color: const Color(0xFF59656F)),
                   ),
                 )
               ],

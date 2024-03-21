@@ -39,15 +39,18 @@ class CategoryInvoiceNotifier extends StateNotifier<CategoryInvoiceState> {
   }
 
   Future<void> deleteCategory(CategoryInvoiceEntity categoryToDelete) async {
+    await Future.delayed(const Duration(
+        milliseconds: 500)); // Esperar 1 segundo antes de ejecutar el código
+
     state = state.copyWith(
       categories: state.categories
           .where((category) => category.id != categoryToDelete.id)
           .toList(),
     );
-    
     await _saveCategoriesToStorage();
   }
-Future<bool> deleteInvoiceByCategoryId(String id) async {
+
+  Future<bool> deleteInvoiceByCategoryId(String id) async {
     try {
       final keyValueStorageService = KeyValueStorageServiceImpl();
       final encodedInvoicesFuture =
@@ -69,6 +72,7 @@ Future<bool> deleteInvoiceByCategoryId(String id) async {
       throw UnimplementedError('No se pudo eliminar la factura');
     }
   }
+
   Future<void> updateCategory(CategoryInvoiceEntity updatedCategory) async {
     state = state.copyWith(
       categories: state.categories.map((category) {
@@ -82,23 +86,24 @@ Future<bool> deleteInvoiceByCategoryId(String id) async {
   }
 
   Future<void> _loadCategoriesFromStorage() async {
-  final encodedCategories =
-      await keyValueStorageService.getKeyValue<String>('categories_invoice');
-  if (encodedCategories != null) {
-    final decodedCategories = jsonDecode(encodedCategories);
-    if (decodedCategories is List) {
-      List<CategoryInvoiceEntity> categories = List<CategoryInvoiceEntity>.from(decodedCategories
-          .map((json) => CategoryInvoiceEntity.fromJson(json)));
+    final encodedCategories =
+        await keyValueStorageService.getKeyValue<String>('categories_invoice');
+    if (encodedCategories != null) {
+      final decodedCategories = jsonDecode(encodedCategories);
+      if (decodedCategories is List) {
+        List<CategoryInvoiceEntity> categories =
+            List<CategoryInvoiceEntity>.from(decodedCategories
+                .map((json) => CategoryInvoiceEntity.fromJson(json)));
 
-      if (categories.isNotEmpty) {
-        state = CategoryInvoiceState(
-          categories: categories,
-          selectedCategory: categories[0].id,
-        );
+        if (categories.isNotEmpty) {
+          state = CategoryInvoiceState(
+            categories: categories,
+            selectedCategory: categories[0].id,
+          );
+        }
       }
     }
   }
-}
 
   Future<void> _saveCategoriesToStorage() async {
     final encodedCategories = jsonEncode(

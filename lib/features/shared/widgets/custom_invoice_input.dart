@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomInvoiceInput extends StatelessWidget {
   final String? label;
@@ -47,9 +48,9 @@ class CustomInvoiceInput extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Text(
                 label!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   color: Colors.black,
                 ),
               ),
@@ -62,16 +63,16 @@ class CustomInvoiceInput extends StatelessWidget {
             maxLines: maxLines,
             maxLength: maxLength,
             initialValue: initialValue,
-            style: const TextStyle(fontSize: 15, color: Colors.black54),
+            style: TextStyle(fontSize: 15.sp, color: Colors.black54),
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 15,
                 horizontal: 15,
               ),
-              floatingLabelStyle: const TextStyle(
+              floatingLabelStyle: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontSize: 15.sp,
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey[300]!),

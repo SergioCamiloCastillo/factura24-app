@@ -1,14 +1,29 @@
 import 'dart:convert';
 
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 import 'package:factura24/features/invoice/domain/datasources/invoices_datasource.dart';
 import 'package:factura24/features/invoice/domain/entities/invoice_entity.dart';
 import 'package:factura24/features/invoice/infrastructure/errors/invoice_error.dart';
 import 'package:factura24/features/invoice/infrastructure/mapper/invoice_mapper.dart';
-import 'package:factura24/features/invoice/infrastructure/models/invoice/invoice_model.dart';
 import 'package:factura24/features/shared/infrastructure/services/key_value_storage_service.dart';
 import 'package:factura24/features/shared/infrastructure/services/key_value_storage_service_impl.dart';
 
 class InvoiceDatasourceImpl extends InvoicesDatasource {
+  late Database _database;
+  @override
+  Future<void> _initDatabase() async {
+    _database = await openDatabase(
+      join(await getDatabasesPath(), 'invoices_information.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE invoices_information(id TEXT PRIMARY KEY, categoryId TEXT, createdAt TEXT, description TEXT, attachmentUrl TEXT, userId INTEGER)",
+        );
+      },
+      version: 1,
+    );
+  }
+
   @override
   Future<List<InvoiceEntity>> getAllInvoices() {
     // TODO: implement getAllInvoices
@@ -17,58 +32,33 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
 
   @override
   Future<List<InvoiceEntity>> getInvoicesByCategoryId(String categoryId) async {
-    print('si llega $categoryId');
-    final keyValueStorageService = KeyValueStorageServiceImpl();
-    try {
-      final encodedInvoices =
-          await keyValueStorageService.getKeyValue<String>('invoices_data');
-      if (encodedInvoices == null) {
-        return [];
-      }
-      List<dynamic> decodedInvoices = jsonDecode(encodedInvoices) ?? [];
-      List<InvoiceEntity> filteredInvoices = decodedInvoices
-          .where((invoice) => invoice['categoryId'] == categoryId)
-          .map<InvoiceEntity>((invoice) => InvoiceMapper.jsonToEntity(invoice))
-          .toList();
-
-      // Ordenar las facturas por fecha
-      filteredInvoices.sort((a, b) =>
-          DateTime.parse(b.createdAt).compareTo(DateTime.parse(a.createdAt)));
-
-      return filteredInvoices;
-    } catch (e) {
-      throw UnimplementedError(
-          'No se pudieron obtener las facturas por categoría');
+    await _initDatabase();
+    final List<Map<String, dynamic>> invoices = await _database.query(
+        'invoices_information',
+        where: 'categoryId = ?',
+        whereArgs: [categoryId]);
+    List<InvoiceEntity> invoiceEntities = [];
+    for (var invoiceMap in invoices) {
+      InvoiceEntity invoiceEntity = InvoiceEntity(
+        id: invoiceMap['id'],
+        categoryId: invoiceMap['categoryId'],
+        createdAt: invoiceMap['createdAt'],
+        description: invoiceMap['description'],
+        attachmentUrl: invoiceMap['attachmentUrl'],
+        userId: invoiceMap['userId'],
+        // Añade otras propiedades si es necesario
+      );
+      invoiceEntities.add(invoiceEntity);
     }
+    return invoiceEntities;
   }
 
   @override
   Future<InvoiceEntity> createInvoice(Map<String, dynamic> invoiceLike) async {
-    print('llega aquiiii');
-    final keyValueStorageService = KeyValueStorageServiceImpl();
-    try {
-      final encodedInvoices =
-          await keyValueStorageService.getKeyValue<String>('invoices_data');
-
-      print('hay 1');
-      List<dynamic> decodedInvoices = [];
-      if (encodedInvoices != null) {
-        decodedInvoices = jsonDecode(encodedInvoices) ?? [];
-      }
-      // Convertir el JSON a una lista de objetos InvoiceEntity
-      print('hay 2');
-
-      final invoice = InvoiceMapper.jsonToEntity(invoiceLike);
-      decodedInvoices
-          .add(invoice.toJson()); // Agregar el nuevo invoice a la lista
-
-      // Codificar toda la lista de nuevo a JSON y guardarla en el almacenamiento
-      keyValueStorageService.setKeyValue(
-          'invoices_data', jsonEncode(decodedInvoices));
-      return invoice;
-    } catch (e) {
-      throw UnimplementedError('No se pudo crear la factura');
-    }
+    await _initDatabase();
+    final InvoiceEntity invoice = InvoiceMapper.jsonToEntity(invoiceLike);
+    await _database.insert('invoices_information', invoice.toJson());
+    return invoice;
   }
 
   @override
@@ -97,21 +87,15 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
   @override
   Future<bool> deleteInvoiceByCategoryId(String id) async {
     try {
-      final keyValueStorageService = KeyValueStorageServiceImpl();
-      final encodedInvoicesFuture =
-          keyValueStorageService.getKeyValue<String>('invoices_data');
-      final encodedInvoices = await encodedInvoicesFuture;
-
-      if (encodedInvoices == null) {
-        throw Exception('No hay facturas almacenadas');
+      await _initDatabase();
+      final rowsDeleted = await _database.delete(
+        'invoices_information',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      if (rowsDeleted == 0) {
+        throw InvoiceNotFoundError();
       }
-
-      final List<dynamic> decodedInvoices = jsonDecode(encodedInvoices) ?? [];
-      final updatedInvoices = decodedInvoices
-          .where((invoice) => invoice['id'] != id)
-          .toList(); // Eliminar la factura con el id especificado
-      keyValueStorageService.setKeyValue(
-          'invoices_data', jsonEncode(updatedInvoices));
       return true;
     } catch (e) {
       throw UnimplementedError('No se pudo eliminar la factura');

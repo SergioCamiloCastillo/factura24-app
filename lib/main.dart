@@ -2,9 +2,10 @@ import 'package:factura24/config/router/app_router.dart';
 import 'package:factura24/config/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MainApp()) );
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -12,10 +13,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme().getTheme(),
-      routerConfig: appRouter,
-    );
+    return ScreenUtilInit(
+        designSize: const Size(360, 690),
+        builder: (_, child) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme().getTheme(),
+            routerConfig: appRouter,
+          );
+        });
   }
 }
