@@ -25,7 +25,7 @@ class InvoiceFormNotifier extends StateNotifier<InvoiceFormState> {
       onSubmitCallback;
 
   InvoiceFormNotifier({this.onSubmitCallback}) : super(InvoiceFormState());
-
+  
   void onAttachmentUrlChanged(String attachmentUrl) {
     state = state.copyWith(attachmentUrl: attachmentUrl);
   }

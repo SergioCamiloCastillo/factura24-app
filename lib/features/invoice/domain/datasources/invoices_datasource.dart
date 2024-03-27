@@ -6,4 +6,6 @@ abstract class InvoicesDatasource {
   Future<InvoiceEntity> createInvoice(Map<String, dynamic> invoiceLike);
   Future<InvoiceEntity> getInvoiceById(String id);
   Future<bool> deleteInvoiceByCategoryId(String id);
+  Future<bool> deleteInvoiceById(String id);
+  
 }

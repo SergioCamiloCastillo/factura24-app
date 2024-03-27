@@ -101,4 +101,22 @@ class InvoiceDatasourceImpl extends InvoicesDatasource {
       throw UnimplementedError('No se pudo eliminar la factura');
     }
   }
+
+  @override
+  Future<bool> deleteInvoiceById(String id) async {
+    try {
+      await _initDatabase();
+      final rowsDeleted = await _database.delete(
+        'invoices_information',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      if (rowsDeleted == 0) {
+        throw InvoiceNotFoundError();
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -157,6 +158,7 @@ class HomeScreen extends ConsumerWidget {
                     color: selectedColor['value']!,
                   ),
                 );
+
                 Navigator.of(context).pop();
               },
             ),
@@ -251,6 +253,7 @@ class _DropDownColorState extends State<_DropDownColor> {
   }
 }
 
+
 class CarouselTabsScreen extends ConsumerStatefulWidget {
   const CarouselTabsScreen({super.key});
 
@@ -258,7 +261,7 @@ class CarouselTabsScreen extends ConsumerStatefulWidget {
   _CarouselTabsScreenState createState() => _CarouselTabsScreenState();
 }
 
-class _CarouselTabsScreenState extends ConsumerState {
+class _CarouselTabsScreenState extends ConsumerState<CarouselTabsScreen> {
   String capitalize(String s) {
     return s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : '';
   }
@@ -268,9 +271,18 @@ class _CarouselTabsScreenState extends ConsumerState {
     // TODO: implement initState
     super.initState();
     ref.read(nowCategoriesProvider.notifier).loadCategories();
+    if (ref.read(nowCategoriesProvider).categories.isNotEmpty) {
+      updateSelectedCard(ref.read(nowCategoriesProvider).categories.first.id);
+    }
   }
 
+
   Map<String, dynamic> _getSelectedCardInfo() {
+    if(ref.read(nowCategoriesProvider).categories.length == 1){
+      final categories = ref.read(nowCategoriesProvider).categories.first;  
+      updateSelectedCard(categories.id);
+      
+    }
     final selectedCategory = ref
         .read(nowCategoriesProvider)
         .categories
@@ -376,7 +388,6 @@ class _CarouselTabsScreenState extends ConsumerState {
               'color': Colors.black
             }; // Si hay coincidencia, devuelve el color correspondiente, de lo contrario, negro
     }).toList();
-
     return categoriesInvoiceState.categories.isNotEmpty
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,33 +497,71 @@ class _CarouselTabsScreenState extends ConsumerState {
                             context, FileImage(File(invoice.attachmentUrl!)));
                       }
                     },
-                    child: Card(
-                      elevation: 4, // Elevación de la tarjeta
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 8), // Márgenes de la tarjeta
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12), // Bordes redondeados
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(
-                            16), // Relleno interno de la lista
-                        title: Text(
-                          formattedDate,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                    child: Slidable(
+                      // Specify a key if the Slidable is dismissible.
+                      key: const ValueKey(1),
+
+                      // The start  pane is the one at the left or the top side.
+                      endActionPane: ActionPane(
+                        // A motion is a widget used to control how the pane animates.
+                        motion: const ScrollMotion(),
+
+                        // All actions are defined in the children parameter.
+                        children: [
+                          // A SlidableAction can have an icon and/or a label.
+                          SlidableAction(
+                            onPressed: (context) {
+                              ref
+                                  .read(invoicesProvider.notifier)
+                                  .deleteInvoiceById(invoice.id);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text('Factura eliminada exitosamente'),
+                                ),
+                              );
+                            },
+                            backgroundColor: const Color(0xFFFE4A49),
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: 'Eliminar factura',
                           ),
+                        ],
+                      ),
+
+                      // The end action pane is the one at the right or the bottom side.
+
+                      // The child of the Slidable is what the user sees when the
+                      // component is not dragged.
+                      child: Card(
+                        elevation: 4, // Elevación de la tarjeta
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8), // Márgenes de la tarjeta
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(12), // Bordes redondeados
                         ),
-                        subtitle: Text(invoice.description ?? ''),
-                        trailing: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              8), // Bordes redondeados de la imagen
-                          child: Image.file(
-                            File(invoice.attachmentUrl!),
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit
-                                .cover, // Ajustar imagen al tamaño del contenedor
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(
+                              16), // Relleno interno de la lista
+                          title: Text(
+                            formattedDate,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(invoice.description ?? ''),
+                          trailing: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                                8), // Bordes redondeados de la imagen
+                            child: Image.file(
+                              File(invoice.attachmentUrl!),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit
+                                  .cover, // Ajustar imagen al tamaño del contenedor
+                            ),
                           ),
                         ),
                       ),
@@ -520,6 +569,19 @@ class _CarouselTabsScreenState extends ConsumerState {
                   );
                 },
               )),
+              const Column(
+                children: [
+                  _TextSuggestionsEnd(
+                      text:
+                          '* Si desea eliminar alguna categoría, mantenga oprimido la tarjeta correspondiente'),
+                  _TextSuggestionsEnd(
+                      text:
+                          '* Para ver la imagen de la factura, toque la tarjeta'),
+                  _TextSuggestionsEnd(
+                      text:
+                          '* Para eliminar una factura, deslice la tarjeta hacia la izquierda')
+                ],
+              ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
@@ -563,11 +625,33 @@ class _CarouselTabsScreenState extends ConsumerState {
                   child: Text(
                     'Por favor, toca el botón de agregar categoría para crear una nueva categoría de factura',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13.sp, color: const Color(0xFF59656F)),
+                    style: TextStyle(
+                        fontSize: 13.sp, color: const Color(0xFF59656F)),
                   ),
                 )
               ],
             ),
           );
+  }
+}
+
+class _TextSuggestionsEnd extends StatelessWidget {
+  final String text;
+  const _TextSuggestionsEnd({
+    Key? key,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Text(
+        text,
+        textAlign: TextAlign.start,
+        style: const TextStyle(
+            color: Colors.red, fontWeight: FontWeight.bold, fontSize: 11),
+      ),
+    );
   }
 }
