@@ -49,9 +49,10 @@ Asegúrate de tener instalados los siguientes requisitos previos antes de comenz
 | go_router           | Enrutador de navegación simple pero poderoso para Flutter que facilita la navegación y la gestión de rutas en la aplicación.                                      | [go_router](https://pub.dev/packages/go_router) 
 | flutter_screenutil             | Es un paquete de Flutter que facilita la creación de interfaces de usuario adaptables a diferentes tamaños de pantalla y densidades de píxeles.  | [flutter_screenutil](https://pub.dev/packages/flutter_screenutil )  
 | flutter_slidable             | Es un paquete de Flutter que proporciona widgets deslizables personalizables que se pueden usar para implementar acciones deslizables en elementos de la interfaz de usuario, como listas, tarjetas, etc.  | [flutter_slidable](https://pub.dev/packages/flutter_slidable ) 
-| gallery_image_viewer             | Es un paquete de Flutter que proporciona una vista de galería de imágenes con funcionalidades como zoom, desplazamiento y navegación entre imágenes.  | [flutter_slidable](https://pub.dev/packages/gallery_image_viewer ) 
-| image_picker             | Es un paquete de Flutter que proporciona una manera sencilla de seleccionar imágenes de la galería del dispositivo o capturar nuevas imágenes desde la cámara. | [flutter_slidable](https://pub.dev/packages/image_picker ) 
-| sqflite             | Es un paquete de Flutter que proporciona un wrapper para SQLite, que es una biblioteca de base de datos relacional que se utiliza comúnmente en aplicaciones móviles, incluidas las aplicaciones Flutter. | [flutter_slidable](https://pub.dev/packages/sqflite ) 
+| gallery_image_viewer             | Es un paquete de Flutter que proporciona una vista de galería de imágenes con funcionalidades como zoom, desplazamiento y navegación entre imágenes.  | [gallery_image_viewer](https://pub.dev/packages/gallery_image_viewer ) 
+| image_picker             | Es un paquete de Flutter que proporciona una manera sencilla de seleccionar imágenes de la galería del dispositivo o capturar nuevas imágenes desde la cámara. | [image_picker](https://pub.dev/packages/image_picker ) 
+| sqflite             | Es un paquete de Flutter que proporciona un wrapper para SQLite, que es una biblioteca de base de datos relacional que se utiliza comúnmente en aplicaciones móviles, incluidas las aplicaciones Flutter. | [sqflite](https://pub.dev/packages/sqflite ) 
+| shared_preferences             |  Es una forma de almacenamiento de datos persistente y simple en Flutter, que permite a las aplicaciones almacenar y recuperar datos de manera eficiente en el dispositivo del usuario.  | [shared_preferences](https://pub.dev/packages/shared_preferences ) 
 
 ## Arquitectura implementada
 
