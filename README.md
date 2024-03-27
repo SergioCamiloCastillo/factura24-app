@@ -16,7 +16,7 @@ Una aplicación hecha en Flutter, tipo repositorio en donde se alojan diferentes
 | Eliminación de categorias      | El usuario puede eliminar una categoría de la lista superior|   
 
 ## Capturas de pantalla
-![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.10.32 p. m..png>)
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.05.49 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.09.57 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.14.10 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.06.19 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.09.41 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.19.01 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.20.21 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.06.34 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.12.34 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.12.40 p. m..png>) ![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.13.37 p. m..png>)
 
 
 ## Requisitos Previos ##
