@@ -15,24 +15,6 @@ Una aplicación hecha en Flutter, tipo repositorio en donde se alojan diferentes
 | Creación de categorias      | El usuario puede crear una categoria para facturas.
 | Eliminación de categorias      | El usuario puede eliminar una categoría de la lista superior|   
 
-## Capturas de pantalla
-
-| Captura 1 | Captura 2 | Captura 3 |
-| --------- | --------- | --------- |
-| ![Captura 1](<Captura de pantalla 2024-03-26 a la(s) 10.05.49 p. m..png>) | ![Captura 2](<Captura de pantalla 2024-03-26 a la(s) 10.09.57 p. m..png>) | ![Captura 3](<Captura de pantalla 2024-03-26 a la(s) 10.14.10 p. m..png>) |
-
-| Captura 4 | Captura 5 | Captura 6 |
-| --------- | --------- | --------- |
-| ![Captura 4](<Captura de pantalla 2024-03-26 a la(s) 10.06.19 p. m..png>) | ![Captura 5](<Captura de pantalla 2024-03-26 a la(s) 10.09.41 p. m..png>) | ![Captura 6](<Captura de pantalla 2024-03-26 a la(s) 10.19.01 p. m..png>) |
-
-| Captura 7 | Captura 8 | Captura 9 |
-| --------- | --------- | --------- |
-| ![Captura 7](<Captura de pantalla 2024-03-26 a la(s) 10.20.21 p. m..png>) | ![Captura 8](<Captura de pantalla 2024-03-26 a la(s) 10.06.34 p. m..png>) | ![Captura 9](<Captura de pantalla 2024-03-26 a la(s) 10.12.34 p. m..png>) |
-
-| Captura 10 | Captura 11 |
-| ---------- | ---------- |
-| ![Captura 10](<Captura de pantalla 2024-03-26 a la(s) 10.12.40 p. m..png>) | ![Captura 11](<Captura de pantalla 2024-03-26 a la(s) 10.13.37 p. m..png>) |
-
 
 ## Requisitos Previos ##
 
@@ -103,3 +85,16 @@ El flujo de trabajo sigue un patrón claro para garantizar la separación de pre
   * Esto facilita el mantenimiento y mejora la legibilidad del código.
 
 Este flujo de trabajo asegura una clara separación de responsabilidades y promueve buenas prácticas de arquitectura de software en el desarrollo del proyecto.
+
+## Capturas de pantalla
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.05.49 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.09.57 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.14.10 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.06.19 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.09.41 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.19.01 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.20.21 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.06.34 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.12.34 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.12.40 p. m..png>) 
+![alt text](<Captura de pantalla 2024-03-26 a la(s) 10.13.37 p. m..png>)
