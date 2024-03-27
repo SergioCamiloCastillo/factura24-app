@@ -47,6 +47,7 @@ Asegúrate de tener instalados los siguientes requisitos previos antes de comenz
 | dio                 | Cliente HTTP para Dart que admite solicitudes RESTful, intercepciones, transformaciones de datos, carga y descarga de archivos, etc.                               | [dio](https://pub.dev/packages/dio)            |
 | flutter_riverpod    | Proveedor de estado para Flutter fácil de usar, conciso y completamente compatible con el árbol de widgets de Flutter.                                          | [flutter_riverpod](https://pub.dev/packages/flutter_riverpod) |
 | go_router           | Enrutador de navegación simple pero poderoso para Flutter que facilita la navegación y la gestión de rutas en la aplicación.                                      | [go_router](https://pub.dev/packages/go_router) 
+| flutter_screenutil             | Es un paquete de Flutter que facilita la creación de interfaces de usuario adaptables a diferentes tamaños de pantalla y densidades de píxeles. [Flutter](https://pub.dev/packages/flutter_screenutil )    
 
 ## Arquitectura implementada
 
