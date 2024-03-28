@@ -2,7 +2,12 @@
 
 ## Descripción
 
-Una aplicación hecha en Flutter compatible tanto para iOS como para Android, tipo repositorio, en donde se alojan diferentes facturas con su descripción, su evidencia (archivo o foto) y su respectiva categoría, subidas por el usuario, para que pueda consultar cualquiera que haya subido antes.
+Desarrollé una aplicación en Flutter compatible con iOS y Android, diseñada como un repositorio central para almacenar facturas. Los usuarios pueden subir diferentes facturas junto con su descripción, evidencia (ya sea un archivo adjunto o una foto) y su respectiva categoría. Esta aplicación permite a los usuarios consultar todas las facturas que hayan subido anteriormente, proporcionando una forma conveniente de gestionar y acceder a la información de manera rápida y sencilla.
+
+## Arquitectura de la información
+
+![alt text](image.png)
+
 
 ## Características
 
@@ -58,7 +63,16 @@ Asegúrate de tener instalados los siguientes requisitos previos antes de comenz
 
 En este proyecto, se siguen los principios de arquitectura limpia al organizar las carpetas y los diferentes componentes del sistema. La capa de dominio define las reglas de negocio y las abstracciones esenciales de la aplicación, se encuentran las definiciones de las entidades, los repositorios y las fuentes de datos; En la capa de infraestructura, se gestionan las tareas relacionadas con la manipulación de datos y la comunicación con recursos externos; y por ultimo, en la capa de presentación, se ocupan de la interfaz de usuario y la interacción del usuario
 
-## Flujo de Trabajo (Clean Architecture) ##
+## Almacenamiento
+
+Se utilizo shared_preferences para gestionar datos de manera local para las categorias de las facturas, mientas que para las facturas como tal, se utilizo sqflite teniendo en cuenta una estructura mas organizada y sus diferentes metodos para crearlas y eliminarlas.
+
+## Gestor de estado
+
+Se uso como Riverpod como gestor de estado para el manejo de las facturas (carga, creacion y eliminación)
+
+
+## Flujo de Trabajo (Clean Architecture) 
 El flujo de trabajo sigue un patrón claro para garantizar la separación de preocupaciones y mantener un código limpio y mantenible. Aquí se detalla el proceso:
 
 **1. Interacción en la Capa de Presentación:**
