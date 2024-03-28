@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Desarrollé una aplicación en Flutter compatible con iOS y Android, diseñada como un repositorio central para almacenar facturas. Los usuarios pueden subir diferentes facturas junto con su descripción, evidencia (ya sea un archivo adjunto o una foto) y su respectiva categoría. Esta aplicación permite a los usuarios consultar todas las facturas que hayan subido anteriormente, proporcionando una forma conveniente de gestionar y acceder a la información de manera rápida y sencilla.
+Se trata de una aplicación en Flutter compatible con iOS y Android, diseñada como un repositorio central para almacenar facturas. Los usuarios pueden subir diferentes facturas junto con su descripción, evidencia (ya sea un archivo adjunto o una foto) y su respectiva categoría. Esta aplicación permite a los usuarios consultar todas las facturas que hayan subido anteriormente, proporcionando una forma conveniente de gestionar y acceder a la información de manera rápida y sencilla.
 
 ## Arquitectura de la información
 
