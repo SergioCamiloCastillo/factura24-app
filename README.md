@@ -8,6 +8,9 @@ Desarrollé una aplicación en Flutter compatible con iOS y Android, diseñada c
 
 ![alt text](image.png)
 
+## Diagrama entidad - relación
+![alt text](image-1.png)
+
 
 ## Características
 
